@@ -1,5 +1,9 @@
 # AION Codex Skill
 
+This skill describes how Codex and AI coding agents should work inside the AION repository.
+
+AION should be treated as the behavioral contract before application code is written or changed.
+
 ## 0. Setup and Installation
 
 Codex must first verify the local AION environment before using the repo.
@@ -11,11 +15,6 @@ If working from a fresh clone:
 ```bash
 npm install
 npm run build
-```
-
-Then verify:
-
-```bash
 npm run typecheck
 npm run schema:check
 ```
@@ -27,11 +26,6 @@ If dependencies are already installed:
 ```bash
 git pull
 npm run build
-```
-
-Then verify:
-
-```bash
 npm run typecheck
 npm run schema:check
 ```
@@ -66,6 +60,17 @@ node dist/src/cli.js graph examples/car-rental-system.aion.json --out system.mmd
 - Codex should use AION as a contract before writing application code.
 - The goal is to move from prompt to validated behavior to generated artifacts to implementation.
 
+AION is the source of truth for:
+
+- actors
+- entities
+- operations
+- permissions
+- guards
+- effects
+- invariants
+- test expectations
+
 ## 2. Core workflow
 
 ```text
@@ -79,6 +84,8 @@ User request
 → Compile executable-ts for proof when applicable
 → Only then implement or extend application code
 ```
+
+The agent should make behavior explicit in AION before patching implementation code.
 
 ## 3. Required commands
 
@@ -101,6 +108,7 @@ node dist/src/cli.js compile aionx project.aion.json --out app.aionx.json
 node dist/src/cli.js run app.aionx.json
 
 node dist/src/cli.js compile executable-ts project.aion.json --out generated-runtime.ts
+npm run compiler:executable-ts:smoke
 ```
 
 ## 4. Rules for Codex
@@ -113,6 +121,8 @@ node dist/src/cli.js compile executable-ts project.aion.json --out generated-run
 - Prefer smoke tests that execute generated artifacts.
 - Do not add dependencies unless necessary.
 - Do not modify package-lock.json unless dependencies changed.
+- Do not change compiler/runtime behavior in documentation-only PRs.
+- Explain affected operations and entities in PR summaries.
 
 ## 5. When creating a new project
 
@@ -149,6 +159,7 @@ D) If the system has a supported executable slice, run:
 
 ```bash
 node dist/src/cli.js compile executable-ts app.aion.json --out generated-runtime.ts
+npm run compiler:executable-ts:smoke
 ```
 
 ## 6. When modifying an existing project
@@ -156,9 +167,26 @@ node dist/src/cli.js compile executable-ts app.aion.json --out generated-runtime
 - locate the related AION operation/entity
 - update AION IR first
 - validate
+- generate the compile plan
 - regenerate affected artifacts
+- generate and inspect AIONX
 - run relevant smoke tests
 - then patch implementation code
+
+Recommended command sequence:
+
+```bash
+npm run build
+npm run typecheck
+npm run schema:check
+
+node dist/src/cli.js validate examples/car-rental-system.aion.json
+node dist/src/cli.js plan examples/car-rental-system.aion.json
+node dist/src/cli.js graph examples/car-rental-system.aion.json --out system.mmd
+node dist/src/cli.js compile aionx examples/car-rental-system.aion.json --out app.aionx.json
+node dist/src/cli.js run app.aionx.json
+npm run compiler:executable-ts:smoke
+```
 
 ## 7. Definition of done
 
@@ -170,6 +198,7 @@ A Codex task using AION is done only when:
 - generated graph or run inspector output is checked
 - tests or smoke tests pass
 - PR summary explains which AION operations/entities changed
+- no unrelated compiler/runtime behavior was changed
 
 ## 8. Current limitations
 
@@ -178,6 +207,9 @@ A Codex task using AION is done only when:
 - AIONX run is currently an inspector, not a full runtime executor
 - app-level generation is still future work
 - some targets are prototype-level
+- no real database adapter exists yet
+- no generic guard evaluator exists yet
+- no production runtime exists yet
 
 ## 9. Example: mini support ticket system
 
