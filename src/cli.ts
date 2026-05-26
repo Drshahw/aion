@@ -3,6 +3,7 @@
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 import { compileAionProgramToPlan } from "./compiler/compileAionProgramToPlan.js";
+import { compileToMermaid } from "./compiler/targets/graph/compileToMermaid.js";
 import { compileToSql } from "./compiler/targets/sql/compileToSql.js";
 import { compileToTypeScript } from "./compiler/targets/typescript/compileToTypeScript.js";
 import { parseAionProgram, AionParseError } from "./parser/parseAionProgram.js";
@@ -53,6 +54,16 @@ try {
       process.exit(0);
     }
 
+    case "graph": {
+      const validation = validateAionProgram(program);
+      if (!validation.ok) {
+        printJson(validation);
+        process.exit(1);
+      }
+      console.log(compileToMermaid(program));
+      process.exit(0);
+    }
+
     case "compile": {
       const target = resolveTarget(args);
       const validation = validateAionProgram(program);
@@ -68,6 +79,11 @@ try {
 
       if (target === "sql") {
         console.log(compileToSql(program));
+        process.exit(0);
+      }
+
+      if (target === "mermaid") {
+        console.log(compileToMermaid(program));
         process.exit(0);
       }
 
@@ -91,7 +107,7 @@ try {
 
 function resolveFilePath(command: string, args: string[]): string | undefined {
   if (command === "compile") {
-    return args.find((arg) => !arg.startsWith("--") && arg !== "typescript" && arg !== "sql");
+    return args.find((arg) => !arg.startsWith("--") && arg !== "typescript" && arg !== "sql" && arg !== "mermaid");
   }
 
   return args[0];
@@ -108,7 +124,7 @@ function resolveTarget(args: string[]): string | undefined {
 
 function printHelp(): void {
   const executable = basename(process.argv[1] ?? "aion");
-  console.log(`AION CLI\n\nUsage:\n  ${executable} validate <file.aion.json>\n  ${executable} plan <file.aion.json>\n  ${executable} manifest <file.aion.json>\n  ${executable} compile --target typescript <file.aion.json>\n  ${executable} compile --target sql <file.aion.json>\n\nCommands:\n  validate   Parse and validate an AION IR file.\n  plan       Validate and generate a compile plan.\n  manifest   Validate and generate a runtime manifest.\n  compile    Validate and compile AION IR to a target artifact.\n`);
+  console.log(`AION CLI\n\nUsage:\n  ${executable} validate <file.aion.json>\n  ${executable} plan <file.aion.json>\n  ${executable} manifest <file.aion.json>\n  ${executable} graph <file.aion.json>\n  ${executable} compile --target typescript <file.aion.json>\n  ${executable} compile --target sql <file.aion.json>\n  ${executable} compile --target mermaid <file.aion.json>\n\nCommands:\n  validate   Parse and validate an AION IR file.\n  plan       Validate and generate a compile plan.\n  manifest   Validate and generate a runtime manifest.\n  graph      Validate and export AION IR as a Mermaid graph.\n  compile    Validate and compile AION IR to a target artifact.\n`);
 }
 
 function printJson(value: unknown): void {
