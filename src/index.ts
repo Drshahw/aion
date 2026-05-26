@@ -22,5 +22,7 @@ export { compileToSql } from "./compiler/targets/sql/compileToSql.js";
 export type { SqlCompileOptions } from "./compiler/targets/sql/compileToSql.js";
 export { compileToMermaid } from "./compiler/targets/graph/compileToMermaid.js";
 export type { MermaidCompileOptions } from "./compiler/targets/graph/compileToMermaid.js";
+export { compileToAionExecutionPlan, compileToAionExecutionPlanJson } from "./compiler/targets/aionx/compileToAionExecutionPlan.js";
+export type { AionExecutionPlan } from "./compiler/targets/aionx/compileToAionExecutionPlan.js";
 export { createRuntimeManifest } from "./runtime/createRuntimeManifest.js";
 export type { AionRuntimeManifest } from "./runtime/createRuntimeManifest.js";
