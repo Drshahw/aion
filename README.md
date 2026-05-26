@@ -63,7 +63,7 @@ src/
   ir/          TypeScript types for AION IR
   parser/      JSON parser for AION programs
   validator/   structural and semantic validation
-  compiler/    target artifact compiler stubs
+  compiler/    target artifact compilers and compile-plan stubs
   runtime/     execution-plan/runtime stubs
 schema/        JSON Schema definitions for AION IR
 examples/      sample AION IR files
@@ -88,6 +88,7 @@ After building the project, run the CLI against any `.aion.json` file:
 npm run aion -- validate examples/car-rental-system.aion.json
 npm run aion -- plan examples/car-rental-system.aion.json
 npm run aion -- manifest examples/car-rental-system.aion.json
+npm run aion -- compile --target typescript examples/car-rental-system.aion.json
 ```
 
 Commands:
@@ -95,6 +96,22 @@ Commands:
 - `validate`: parse and validate an AION IR file.
 - `plan`: validate and generate a compile plan.
 - `manifest`: validate and generate a runtime manifest.
+- `compile`: validate and compile AION IR to a target artifact.
+
+## TypeScript compiler target
+
+The first experimental compiler target emits TypeScript interfaces and operation stubs from an AION program.
+
+```bash
+npm run build
+npm run aion -- compile --target typescript examples/car-rental-system.aion.json > generated.ts
+```
+
+The output is intentionally a prototype artifact. It is meant to prove the pipeline:
+
+```text
+AION IR → validation → TypeScript artifact
+```
 
 ## JSON Schema
 
@@ -125,7 +142,8 @@ import {
   parseAionProgram,
   validateAionProgram,
   compileAionProgramToPlan,
-  createRuntimeManifest
+  createRuntimeManifest,
+  compileToTypeScript
 } from "aion-ir";
 
 const program = parseAionProgram(source);
@@ -137,6 +155,7 @@ if (!validation.ok) {
 
 const plan = compileAionProgramToPlan(program);
 const manifest = createRuntimeManifest(program);
+const typescript = compileToTypeScript(program);
 ```
 
 ## Tiny example

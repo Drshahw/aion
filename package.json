@@ -44,7 +44,8 @@
     "test": "vitest run",
     "dev": "vitest",
     "aion": "node dist/src/cli.js",
-    "schema:check": "node scripts/validate-schema.mjs"
+    "schema:check": "node scripts/validate-schema.mjs",
+    "compiler:typescript:smoke": "node scripts/compile-typescript-smoke.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
