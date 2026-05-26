@@ -89,6 +89,7 @@ npm run aion -- validate examples/car-rental-system.aion.json
 npm run aion -- plan examples/car-rental-system.aion.json
 npm run aion -- manifest examples/car-rental-system.aion.json
 npm run aion -- compile --target typescript examples/car-rental-system.aion.json
+npm run aion -- compile --target sql examples/car-rental-system.aion.json
 ```
 
 Commands:
@@ -112,6 +113,17 @@ The output is intentionally a prototype artifact. It is meant to prove the pipel
 ```text
 AION IR → validation → TypeScript artifact
 ```
+
+## SQL compiler target
+
+The experimental SQL compiler target emits PostgreSQL-compatible DDL from AION entities.
+
+```bash
+npm run build
+npm run aion -- compile --target sql examples/car-rental-system.aion.json > generated.sql
+```
+
+The current target maps AION scalar types to PostgreSQL-style column types and emits `CREATE TABLE IF NOT EXISTS` statements.
 
 ## JSON Schema
 
@@ -143,7 +155,8 @@ import {
   validateAionProgram,
   compileAionProgramToPlan,
   createRuntimeManifest,
-  compileToTypeScript
+  compileToTypeScript,
+  compileToSql
 } from "aion-ir";
 
 const program = parseAionProgram(source);
@@ -156,6 +169,7 @@ if (!validation.ok) {
 const plan = compileAionProgramToPlan(program);
 const manifest = createRuntimeManifest(program);
 const typescript = compileToTypeScript(program);
+const sql = compileToSql(program);
 ```
 
 ## Tiny example
