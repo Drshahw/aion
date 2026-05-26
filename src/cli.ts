@@ -4,6 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { basename } from "node:path";
 import { compileAionProgramToPlan } from "./compiler/compileAionProgramToPlan.js";
 import { compileToAionExecutionPlanJson } from "./compiler/targets/aionx/compileToAionExecutionPlan.js";
+import { compileToExecutableTypeScript } from "./compiler/targets/executable-ts/compileToExecutableTypeScript.js";
 import { compileToMermaid } from "./compiler/targets/graph/compileToMermaid.js";
 import { compileToSql } from "./compiler/targets/sql/compileToSql.js";
 import { compileToTypeScript } from "./compiler/targets/typescript/compileToTypeScript.js";
@@ -13,7 +14,7 @@ import { createRuntimeManifest } from "./runtime/createRuntimeManifest.js";
 import { formatAionRunInspection, inspectAionExecutionPlan } from "./runtime/inspectAionExecutionPlan.js";
 import { validateAionProgram } from "./validator/validateAionProgram.js";
 
-const COMPILE_TARGETS = new Set(["typescript", "sql", "mermaid", "aionx"]);
+const COMPILE_TARGETS = new Set(["typescript", "sql", "mermaid", "aionx", "executable-ts"]);
 const OUTPUT_FLAGS = new Set(["--out", "-o"]);
 const [, , command, ...args] = process.argv;
 
@@ -102,6 +103,11 @@ try {
         process.exit(0);
       }
 
+      if (target === "executable-ts") {
+        writeOrPrint(compileToExecutableTypeScript(program), outPath);
+        process.exit(0);
+      }
+
       if (target === "sql") {
         writeOrPrint(compileToSql(program), outPath);
         process.exit(0);
@@ -182,7 +188,7 @@ function writeOrPrint(output: string, outPath?: string): void {
 
 function printHelp(): void {
   const executable = basename(process.argv[1] ?? "aion");
-  console.log(`AION CLI\n\nUsage:\n  ${executable} init [file.aion.json]\n  ${executable} validate <file.aion.json>\n  ${executable} plan <file.aion.json>\n  ${executable} manifest <file.aion.json>\n  ${executable} graph <file.aion.json> [--out file]\n  ${executable} run <file.aionx.json>\n  ${executable} compile typescript <file.aion.json> [--out file]\n  ${executable} compile sql <file.aion.json> [--out file]\n  ${executable} compile mermaid <file.aion.json> [--out file]\n  ${executable} compile aionx <file.aion.json> [--out file]\n  ${executable} compile --target typescript <file.aion.json> [--out file]\n  ${executable} compile --target sql <file.aion.json> [--out file]\n  ${executable} compile --target mermaid <file.aion.json> [--out file]\n  ${executable} compile --target aionx <file.aion.json> [--out file]\n\nCommands:\n  init       Create a starter AION IR file.\n  validate   Parse and validate an AION IR file.\n  plan       Validate and generate a compile plan.\n  manifest   Validate and generate a runtime manifest.\n  graph      Validate and export AION IR as a Mermaid graph.\n  run        Inspect an AIONX execution plan.\n  compile    Validate and compile AION IR to a target artifact.\n\nOptions:\n  -o, --out  Write generated artifacts as UTF-8 instead of printing to stdout.\n`);
+  console.log(`AION CLI\n\nUsage:\n  ${executable} init [file.aion.json]\n  ${executable} validate <file.aion.json>\n  ${executable} plan <file.aion.json>\n  ${executable} manifest <file.aion.json>\n  ${executable} graph <file.aion.json> [--out file]\n  ${executable} run <file.aionx.json>\n  ${executable} compile typescript <file.aion.json> [--out file]\n  ${executable} compile executable-ts <file.aion.json> [--out file]\n  ${executable} compile sql <file.aion.json> [--out file]\n  ${executable} compile mermaid <file.aion.json> [--out file]\n  ${executable} compile aionx <file.aion.json> [--out file]\n  ${executable} compile --target typescript <file.aion.json> [--out file]\n  ${executable} compile --target executable-ts <file.aion.json> [--out file]\n  ${executable} compile --target sql <file.aion.json> [--out file]\n  ${executable} compile --target mermaid <file.aion.json> [--out file]\n  ${executable} compile --target aionx <file.aion.json> [--out file]\n\nCommands:\n  init       Create a starter AION IR file.\n  validate   Parse and validate an AION IR file.\n  plan       Validate and generate a compile plan.\n  manifest   Validate and generate a runtime manifest.\n  graph      Validate and export AION IR as a Mermaid graph.\n  run        Inspect an AIONX execution plan.\n  compile    Validate and compile AION IR to a target artifact.\n\nOptions:\n  -o, --out  Write generated artifacts as UTF-8 instead of printing to stdout.\n`);
 }
 
 function printJson(value: unknown): void {
