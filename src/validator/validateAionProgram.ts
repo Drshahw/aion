@@ -177,9 +177,13 @@ function validateEntityReferences(
 }
 
 function error(code: string, message: string, path?: string): AionDiagnostic {
-  return { level: "error", code, message, path };
+  return diagnostic("error", code, message, path);
 }
 
 function warning(code: string, message: string, path?: string): AionDiagnostic {
-  return { level: "warning", code, message, path };
+  return diagnostic("warning", code, message, path);
+}
+
+function diagnostic(level: AionDiagnostic["level"], code: string, message: string, path?: string): AionDiagnostic {
+  return path === undefined ? { level, code, message } : { level, code, message, path };
 }
