@@ -30,3 +30,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Compiler smoke
+        run: npm run compiler:typescript:smoke
