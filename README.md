@@ -23,14 +23,24 @@ npm run build
 
 ## CLI usage
 
+For human-readable console output, use `npm run aion`:
+
 ```bash
 npm run aion -- validate examples/car-rental-system.aion.json
 npm run aion -- plan examples/car-rental-system.aion.json
 npm run aion -- manifest examples/car-rental-system.aion.json
 npm run aion -- graph examples/car-rental-system.aion.json
-npm run aion -- compile --target typescript examples/car-rental-system.aion.json
-npm run aion -- compile --target sql examples/car-rental-system.aion.json
-npm run aion -- compile --target mermaid examples/car-rental-system.aion.json
+npm run aion -- compile typescript examples/car-rental-system.aion.json
+npm run aion -- compile sql examples/car-rental-system.aion.json
+npm run aion -- compile mermaid examples/car-rental-system.aion.json
+```
+
+When redirecting generated artifacts to files, use `node` directly or `npm run --silent` so npm's script banner is not written into the file:
+
+```bash
+node dist/src/cli.js compile typescript examples/car-rental-system.aion.json > generated.ts
+node dist/src/cli.js compile sql examples/car-rental-system.aion.json > generated.sql
+node dist/src/cli.js graph examples/car-rental-system.aion.json > system.mmd
 ```
 
 ## Graph export
@@ -39,7 +49,7 @@ The graph exporter emits a Mermaid flowchart so humans can review system behavio
 
 ```bash
 npm run build
-npm run aion -- graph examples/car-rental-system.aion.json > system.mmd
+node dist/src/cli.js graph examples/car-rental-system.aion.json > system.mmd
 ```
 
 The graph includes actors, entities, operations, read/write edges, guards, and effects.
@@ -47,9 +57,9 @@ The graph includes actors, entities, operations, read/write edges, guards, and e
 ## Compiler targets
 
 ```bash
-npm run aion -- compile --target typescript examples/car-rental-system.aion.json > generated.ts
-npm run aion -- compile --target sql examples/car-rental-system.aion.json > generated.sql
-npm run aion -- compile --target mermaid examples/car-rental-system.aion.json > system.mmd
+node dist/src/cli.js compile typescript examples/car-rental-system.aion.json > generated.ts
+node dist/src/cli.js compile sql examples/car-rental-system.aion.json > generated.sql
+node dist/src/cli.js compile mermaid examples/car-rental-system.aion.json > system.mmd
 ```
 
 ## JSON Schema
