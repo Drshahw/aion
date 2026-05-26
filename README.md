@@ -65,6 +65,7 @@ src/
   validator/   structural and semantic validation
   compiler/    target artifact compiler stubs
   runtime/     execution-plan/runtime stubs
+schema/        JSON Schema definitions for AION IR
 examples/      sample AION IR files
 docs/          project vision and architecture notes
 tests/         early validation tests
@@ -75,6 +76,7 @@ tests/         early validation tests
 ```bash
 npm install
 npm run typecheck
+npm run schema:check
 npm run build
 ```
 
@@ -93,6 +95,28 @@ Commands:
 - `validate`: parse and validate an AION IR file.
 - `plan`: validate and generate a compile plan.
 - `manifest`: validate and generate a runtime manifest.
+
+## JSON Schema
+
+AION v0.1 includes a formal JSON Schema:
+
+```text
+schema/aion-0.1.schema.json
+```
+
+Use it as the first validation gate before semantic validation:
+
+```text
+Prompt → AI-generated AION JSON → JSON Schema validation → AION semantic validation → compile plan
+```
+
+Run the schema check locally:
+
+```bash
+npm run schema:check
+```
+
+See `docs/schema.md` for details.
 
 ## Library usage
 
