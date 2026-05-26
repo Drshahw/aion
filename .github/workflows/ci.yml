@@ -42,3 +42,6 @@ jobs:
 
       - name: Graph exporter smoke
         run: npm run compiler:graph:smoke
+
+      - name: AIONX compiler smoke
+        run: node scripts/compile-aionx-smoke.mjs
