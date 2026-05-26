@@ -43,19 +43,22 @@ npm run aion -- run app.aionx.json
 For clean generated files, use `node` directly:
 
 ```bash
-node dist/src/cli.js compile typescript examples/car-rental-system.aion.json > generated.ts
-node dist/src/cli.js compile sql examples/car-rental-system.aion.json > generated.sql
-node dist/src/cli.js graph examples/car-rental-system.aion.json > system.mmd
-node dist/src/cli.js compile aionx examples/car-rental-system.aion.json > app.aionx.json
+node dist/src/cli.js compile typescript examples/car-rental-system.aion.json --out generated.ts
+node dist/src/cli.js compile sql examples/car-rental-system.aion.json --out generated.sql
+node dist/src/cli.js compile mermaid examples/car-rental-system.aion.json --out system.mmd
+node dist/src/cli.js graph examples/car-rental-system.aion.json --out system.mmd
+node dist/src/cli.js compile aionx examples/car-rental-system.aion.json --out app.aionx.json
 node dist/src/cli.js run app.aionx.json
 ```
+
+Use `--out` or `-o` instead of shell redirect on Windows PowerShell to avoid encoding issues in generated files.
 
 ## AIONX native target
 
 AIONX is the first native AION target. It emits a machine-readable execution plan instead of human-oriented source code.
 
 ```bash
-node dist/src/cli.js compile aionx examples/car-rental-system.aion.json > app.aionx.json
+node dist/src/cli.js compile aionx examples/car-rental-system.aion.json --out app.aionx.json
 node dist/src/cli.js run app.aionx.json
 ```
 

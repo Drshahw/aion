@@ -48,6 +48,7 @@
     "compiler:typescript:smoke": "node scripts/compile-typescript-smoke.mjs",
     "compiler:sql:smoke": "node scripts/compile-sql-smoke.mjs",
     "compiler:graph:smoke": "node scripts/compile-graph-smoke.mjs",
+    "out:smoke": "node scripts/out-smoke.mjs",
     "runtime:aionx:smoke": "node scripts/run-aionx-smoke.mjs",
     "init:smoke": "node scripts/init-smoke.mjs"
   },
