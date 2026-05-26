@@ -21,6 +21,15 @@ npm run schema:check
 npm run build
 ```
 
+## Start a new AION file
+
+```bash
+npm run aion -- init
+npm run aion -- init gym.aion.json
+```
+
+The default command creates `project.aion.json`. AION refuses to overwrite an existing file.
+
 ## CLI usage
 
 For human-readable console output, use `npm run aion`:

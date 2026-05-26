@@ -31,6 +31,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Init smoke
+        run: npm run init:smoke
+
       - name: TypeScript compiler smoke
         run: npm run compiler:typescript:smoke
 
