@@ -47,7 +47,8 @@
     "schema:check": "node scripts/validate-schema.mjs",
     "compiler:typescript:smoke": "node scripts/compile-typescript-smoke.mjs",
     "compiler:sql:smoke": "node scripts/compile-sql-smoke.mjs",
-    "compiler:graph:smoke": "node scripts/compile-graph-smoke.mjs"
+    "compiler:graph:smoke": "node scripts/compile-graph-smoke.mjs",
+    "init:smoke": "node scripts/init-smoke.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
