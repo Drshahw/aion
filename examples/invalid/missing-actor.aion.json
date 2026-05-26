@@ -1,0 +1,23 @@
+{
+  "aion": "0.1",
+  "kind": "system",
+  "metadata": {
+    "name": "invalid-missing-actor"
+  },
+  "actors": [],
+  "entities": [
+    {
+      "id": "message",
+      "fields": [
+        { "id": "id", "type": "uuid", "required": true }
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "id": "message.create",
+      "intent": "Create a message",
+      "actor": "user"
+    }
+  ]
+}

@@ -25,5 +25,8 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Schema validation
+        run: npm run schema:check
+
       - name: Build
         run: npm run build
