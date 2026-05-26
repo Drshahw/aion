@@ -75,8 +75,44 @@ tests/         early validation tests
 ```bash
 npm install
 npm run typecheck
-npm test
 npm run build
+```
+
+## CLI usage
+
+After building the project, run the CLI against any `.aion.json` file:
+
+```bash
+npm run aion -- validate examples/car-rental-system.aion.json
+npm run aion -- plan examples/car-rental-system.aion.json
+npm run aion -- manifest examples/car-rental-system.aion.json
+```
+
+Commands:
+
+- `validate`: parse and validate an AION IR file.
+- `plan`: validate and generate a compile plan.
+- `manifest`: validate and generate a runtime manifest.
+
+## Library usage
+
+```ts
+import {
+  parseAionProgram,
+  validateAionProgram,
+  compileAionProgramToPlan,
+  createRuntimeManifest
+} from "aion-ir";
+
+const program = parseAionProgram(source);
+const validation = validateAionProgram(program);
+
+if (!validation.ok) {
+  console.log(validation.diagnostics);
+}
+
+const plan = compileAionProgramToPlan(program);
+const manifest = createRuntimeManifest(program);
 ```
 
 ## Tiny example

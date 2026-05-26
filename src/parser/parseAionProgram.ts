@@ -21,7 +21,7 @@ export function parseAionProgram(input: string): AionProgram {
     throw new AionParseError("AION program must be a JSON object.");
   }
 
-  return parsed as AionProgram;
+  return parsed as unknown as AionProgram;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
