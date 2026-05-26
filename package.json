@@ -1,0 +1,48 @@
+{
+  "name": "aion-ir",
+  "version": "0.1.0",
+  "description": "AI-native intermediate representation for compiling human intent into verified software systems.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "intermediate-representation",
+    "compiler",
+    "intent",
+    "software-engineering",
+    "agents"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Drshahw/aion.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Drshahw/aion/issues"
+  },
+  "homepage": "https://github.com/Drshahw/aion#readme",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "dev": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
