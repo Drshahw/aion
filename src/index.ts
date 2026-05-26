@@ -26,3 +26,5 @@ export { compileToAionExecutionPlan, compileToAionExecutionPlanJson } from "./co
 export type { AionExecutionPlan } from "./compiler/targets/aionx/compileToAionExecutionPlan.js";
 export { createRuntimeManifest } from "./runtime/createRuntimeManifest.js";
 export type { AionRuntimeManifest } from "./runtime/createRuntimeManifest.js";
+export { inspectAionExecutionPlan, formatAionRunInspection } from "./runtime/inspectAionExecutionPlan.js";
+export type { AionRunInspection, AionRunInspectionOperation } from "./runtime/inspectAionExecutionPlan.js";

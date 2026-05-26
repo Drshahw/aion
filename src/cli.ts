@@ -10,6 +10,7 @@ import { compileToTypeScript } from "./compiler/targets/typescript/compileToType
 import { createStarterProgramJson } from "./init/createStarterProgram.js";
 import { parseAionProgram, AionParseError } from "./parser/parseAionProgram.js";
 import { createRuntimeManifest } from "./runtime/createRuntimeManifest.js";
+import { formatAionRunInspection, inspectAionExecutionPlan } from "./runtime/inspectAionExecutionPlan.js";
 import { validateAionProgram } from "./validator/validateAionProgram.js";
 
 const COMPILE_TARGETS = new Set(["typescript", "sql", "mermaid", "aionx"]);
@@ -39,6 +40,13 @@ if (!filePath) {
 }
 
 try {
+  if (command === "run") {
+    const source = readFileSync(filePath, "utf8");
+    const inspection = inspectAionExecutionPlan(JSON.parse(source) as unknown);
+    process.stdout.write(formatAionRunInspection(inspection));
+    process.exit(0);
+  }
+
   const source = readFileSync(filePath, "utf8");
   const program = parseAionProgram(source);
 
@@ -146,7 +154,7 @@ function resolveTarget(args: string[]): string | undefined {
 
 function printHelp(): void {
   const executable = basename(process.argv[1] ?? "aion");
-  console.log(`AION CLI\n\nUsage:\n  ${executable} init [file.aion.json]\n  ${executable} validate <file.aion.json>\n  ${executable} plan <file.aion.json>\n  ${executable} manifest <file.aion.json>\n  ${executable} graph <file.aion.json>\n  ${executable} compile typescript <file.aion.json>\n  ${executable} compile sql <file.aion.json>\n  ${executable} compile mermaid <file.aion.json>\n  ${executable} compile aionx <file.aion.json>\n  ${executable} compile --target typescript <file.aion.json>\n  ${executable} compile --target sql <file.aion.json>\n  ${executable} compile --target mermaid <file.aion.json>\n  ${executable} compile --target aionx <file.aion.json>\n\nCommands:\n  init       Create a starter AION IR file.\n  validate   Parse and validate an AION IR file.\n  plan       Validate and generate a compile plan.\n  manifest   Validate and generate a runtime manifest.\n  graph      Validate and export AION IR as a Mermaid graph.\n  compile    Validate and compile AION IR to a target artifact.\n`);
+  console.log(`AION CLI\n\nUsage:\n  ${executable} init [file.aion.json]\n  ${executable} validate <file.aion.json>\n  ${executable} plan <file.aion.json>\n  ${executable} manifest <file.aion.json>\n  ${executable} graph <file.aion.json>\n  ${executable} run <file.aionx.json>\n  ${executable} compile typescript <file.aion.json>\n  ${executable} compile sql <file.aion.json>\n  ${executable} compile mermaid <file.aion.json>\n  ${executable} compile aionx <file.aion.json>\n  ${executable} compile --target typescript <file.aion.json>\n  ${executable} compile --target sql <file.aion.json>\n  ${executable} compile --target mermaid <file.aion.json>\n  ${executable} compile --target aionx <file.aion.json>\n\nCommands:\n  init       Create a starter AION IR file.\n  validate   Parse and validate an AION IR file.\n  plan       Validate and generate a compile plan.\n  manifest   Validate and generate a runtime manifest.\n  graph      Validate and export AION IR as a Mermaid graph.\n  run        Inspect an AIONX execution plan.\n  compile    Validate and compile AION IR to a target artifact.\n`);
 }
 
 function printJson(value: unknown): void {
