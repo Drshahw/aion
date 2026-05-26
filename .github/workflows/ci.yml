@@ -31,5 +31,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Compiler smoke
+      - name: TypeScript compiler smoke
         run: npm run compiler:typescript:smoke
+
+      - name: SQL compiler smoke
+        run: npm run compiler:sql:smoke
