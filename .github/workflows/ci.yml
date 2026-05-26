@@ -46,5 +46,8 @@ jobs:
       - name: AIONX compiler smoke
         run: node scripts/compile-aionx-smoke.mjs
 
+      - name: Output file smoke
+        run: npm run out:smoke
+
       - name: AIONX run smoke
         run: npm run runtime:aionx:smoke
