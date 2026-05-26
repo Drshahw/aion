@@ -36,3 +36,6 @@ jobs:
 
       - name: SQL compiler smoke
         run: npm run compiler:sql:smoke
+
+      - name: Graph exporter smoke
+        run: npm run compiler:graph:smoke
