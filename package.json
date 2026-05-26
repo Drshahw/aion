@@ -46,6 +46,7 @@
     "aion": "node dist/src/cli.js",
     "schema:check": "node scripts/validate-schema.mjs",
     "compiler:typescript:smoke": "node scripts/compile-typescript-smoke.mjs",
+    "compiler:executable-ts:smoke": "node scripts/executable-ts-smoke.mjs",
     "compiler:sql:smoke": "node scripts/compile-sql-smoke.mjs",
     "compiler:graph:smoke": "node scripts/compile-graph-smoke.mjs",
     "out:smoke": "node scripts/out-smoke.mjs",

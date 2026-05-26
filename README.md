@@ -34,6 +34,7 @@ npm run aion -- plan examples/car-rental-system.aion.json
 npm run aion -- manifest examples/car-rental-system.aion.json
 npm run aion -- graph examples/car-rental-system.aion.json
 npm run aion -- compile typescript examples/car-rental-system.aion.json
+npm run aion -- compile executable-ts examples/car-rental-system.aion.json
 npm run aion -- compile sql examples/car-rental-system.aion.json
 npm run aion -- compile mermaid examples/car-rental-system.aion.json
 npm run aion -- compile aionx examples/car-rental-system.aion.json
@@ -44,6 +45,7 @@ For clean generated files, use `node` directly:
 
 ```bash
 node dist/src/cli.js compile typescript examples/car-rental-system.aion.json --out generated.ts
+node dist/src/cli.js compile executable-ts examples/car-rental-system.aion.json --out generated-runtime.ts
 node dist/src/cli.js compile sql examples/car-rental-system.aion.json --out generated.sql
 node dist/src/cli.js compile mermaid examples/car-rental-system.aion.json --out system.mmd
 node dist/src/cli.js graph examples/car-rental-system.aion.json --out system.mmd
@@ -65,6 +67,16 @@ node dist/src/cli.js run app.aionx.json
 `run` is currently an inspector and dry-run runtime. It prints a summary of the compiled AIONX execution plan, but it does not execute business logic yet.
 
 The underlying AIONX artifact is still the first compiled internal plan that a future AION Runtime can interpret, optimize, replay, or execute.
+
+## Executable TypeScript target
+
+`executable-ts` is an experimental proof-of-concept target. It generates an in-memory executable runtime to prove that operation behavior can be derived from AION IR.
+
+```bash
+node dist/src/cli.js compile executable-ts examples/car-rental-system.aion.json --out generated-runtime.ts
+```
+
+This target is intentionally narrow. It is not a full app generator yet, but it demonstrates executable behavior for the current car-rental operations.
 
 ## Existing targets
 
