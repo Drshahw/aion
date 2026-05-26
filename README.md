@@ -37,6 +37,7 @@ npm run aion -- compile typescript examples/car-rental-system.aion.json
 npm run aion -- compile sql examples/car-rental-system.aion.json
 npm run aion -- compile mermaid examples/car-rental-system.aion.json
 npm run aion -- compile aionx examples/car-rental-system.aion.json
+npm run aion -- run app.aionx.json
 ```
 
 For clean generated files, use `node` directly:
@@ -46,6 +47,7 @@ node dist/src/cli.js compile typescript examples/car-rental-system.aion.json > g
 node dist/src/cli.js compile sql examples/car-rental-system.aion.json > generated.sql
 node dist/src/cli.js graph examples/car-rental-system.aion.json > system.mmd
 node dist/src/cli.js compile aionx examples/car-rental-system.aion.json > app.aionx.json
+node dist/src/cli.js run app.aionx.json
 ```
 
 ## AIONX native target
@@ -54,9 +56,12 @@ AIONX is the first native AION target. It emits a machine-readable execution pla
 
 ```bash
 node dist/src/cli.js compile aionx examples/car-rental-system.aion.json > app.aionx.json
+node dist/src/cli.js run app.aionx.json
 ```
 
-This is not a full runtime yet. It is the first compiled internal plan that a future AION Runtime can interpret, optimize, replay, or execute.
+`run` is currently an inspector and dry-run runtime. It prints a summary of the compiled AIONX execution plan, but it does not execute business logic yet.
+
+The underlying AIONX artifact is still the first compiled internal plan that a future AION Runtime can interpret, optimize, replay, or execute.
 
 ## Existing targets
 
