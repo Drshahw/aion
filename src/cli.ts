@@ -3,6 +3,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { basename } from "node:path";
 import { compileAionProgramToPlan } from "./compiler/compileAionProgramToPlan.js";
+import { compileToAionExecutionPlanJson } from "./compiler/targets/aionx/compileToAionExecutionPlan.js";
 import { compileToMermaid } from "./compiler/targets/graph/compileToMermaid.js";
 import { compileToSql } from "./compiler/targets/sql/compileToSql.js";
 import { compileToTypeScript } from "./compiler/targets/typescript/compileToTypeScript.js";
@@ -11,7 +12,7 @@ import { parseAionProgram, AionParseError } from "./parser/parseAionProgram.js";
 import { createRuntimeManifest } from "./runtime/createRuntimeManifest.js";
 import { validateAionProgram } from "./validator/validateAionProgram.js";
 
-const COMPILE_TARGETS = new Set(["typescript", "sql", "mermaid"]);
+const COMPILE_TARGETS = new Set(["typescript", "sql", "mermaid", "aionx"]);
 const [, , command, ...args] = process.argv;
 
 if (!command || command === "help" || command === "--help" || command === "-h") {
@@ -101,6 +102,11 @@ try {
         process.exit(0);
       }
 
+      if (target === "aionx") {
+        console.log(compileToAionExecutionPlanJson(program));
+        process.exit(0);
+      }
+
       fail(`Unsupported compile target: ${target ?? "missing"}`);
     }
 
@@ -140,7 +146,7 @@ function resolveTarget(args: string[]): string | undefined {
 
 function printHelp(): void {
   const executable = basename(process.argv[1] ?? "aion");
-  console.log(`AION CLI\n\nUsage:\n  ${executable} init [file.aion.json]\n  ${executable} validate <file.aion.json>\n  ${executable} plan <file.aion.json>\n  ${executable} manifest <file.aion.json>\n  ${executable} graph <file.aion.json>\n  ${executable} compile typescript <file.aion.json>\n  ${executable} compile sql <file.aion.json>\n  ${executable} compile mermaid <file.aion.json>\n  ${executable} compile --target typescript <file.aion.json>\n  ${executable} compile --target sql <file.aion.json>\n  ${executable} compile --target mermaid <file.aion.json>\n\nCommands:\n  init       Create a starter AION IR file.\n  validate   Parse and validate an AION IR file.\n  plan       Validate and generate a compile plan.\n  manifest   Validate and generate a runtime manifest.\n  graph      Validate and export AION IR as a Mermaid graph.\n  compile    Validate and compile AION IR to a target artifact.\n`);
+  console.log(`AION CLI\n\nUsage:\n  ${executable} init [file.aion.json]\n  ${executable} validate <file.aion.json>\n  ${executable} plan <file.aion.json>\n  ${executable} manifest <file.aion.json>\n  ${executable} graph <file.aion.json>\n  ${executable} compile typescript <file.aion.json>\n  ${executable} compile sql <file.aion.json>\n  ${executable} compile mermaid <file.aion.json>\n  ${executable} compile aionx <file.aion.json>\n  ${executable} compile --target typescript <file.aion.json>\n  ${executable} compile --target sql <file.aion.json>\n  ${executable} compile --target mermaid <file.aion.json>\n  ${executable} compile --target aionx <file.aion.json>\n\nCommands:\n  init       Create a starter AION IR file.\n  validate   Parse and validate an AION IR file.\n  plan       Validate and generate a compile plan.\n  manifest   Validate and generate a runtime manifest.\n  graph      Validate and export AION IR as a Mermaid graph.\n  compile    Validate and compile AION IR to a target artifact.\n`);
 }
 
 function printJson(value: unknown): void {
