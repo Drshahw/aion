@@ -1,0 +1,82 @@
+{
+  "aion": "0.1",
+  "kind": "system",
+  "metadata": {
+    "name": "car-rental-billing",
+    "description": "A small AION IR example for car rental billing, invoices, fines, and payments.",
+    "version": "0.1.0",
+    "tags": ["billing", "car-rental", "audit"]
+  },
+  "actors": [
+    { "id": "admin", "role": "human", "description": "Back office user with full billing access." },
+    { "id": "customer", "role": "human", "description": "Rental customer who can access own invoices." },
+    { "id": "billing_agent", "role": "agent", "description": "AI agent that checks totals and prepares billing notes." }
+  ],
+  "entities": [
+    {
+      "id": "customer",
+      "fields": [
+        { "id": "id", "type": "uuid", "required": true },
+        { "id": "full_name", "type": "string", "required": true },
+        { "id": "phone", "type": "string" }
+      ]
+    },
+    {
+      "id": "vehicle",
+      "fields": [
+        { "id": "id", "type": "uuid", "required": true },
+        { "id": "plate_number", "type": "string", "required": true },
+        { "id": "model", "type": "string" }
+      ]
+    },
+    {
+      "id": "invoice",
+      "fields": [
+        { "id": "id", "type": "uuid", "required": true },
+        { "id": "customer_id", "type": "uuid", "required": true },
+        { "id": "vehicle_id", "type": "uuid", "required": true },
+        { "id": "rent_amount", "type": "number", "required": true },
+        { "id": "fines_amount", "type": "number", "required": true },
+        { "id": "salik_amount", "type": "number", "required": true },
+        { "id": "total_amount", "type": "number", "required": true },
+        { "id": "status", "type": "string", "required": true }
+      ]
+    }
+  ],
+  "operations": [
+    {
+      "id": "invoice.create",
+      "intent": "Create an invoice for a rental customer.",
+      "actor": "admin",
+      "reads": ["customer", "vehicle"],
+      "writes": ["invoice"],
+      "inputs": [
+        { "id": "customer_id", "type": "uuid", "required": true },
+        { "id": "vehicle_id", "type": "uuid", "required": true },
+        { "id": "rent_amount", "type": "number", "required": true },
+        { "id": "fines_amount", "type": "number", "required": true },
+        { "id": "salik_amount", "type": "number", "required": true }
+      ],
+      "outputs": [
+        { "id": "invoice_id", "type": "uuid", "required": true }
+      ],
+      "guards": ["actor.role == admin", "rent_amount >= 0", "fines_amount >= 0", "salik_amount >= 0"],
+      "effects": ["audit.log:invoice.create"],
+      "invariants": ["total_amount == rent_amount + fines_amount + salik_amount"],
+      "tests": ["reject negative amounts", "calculate total amount", "write audit log"]
+    },
+    {
+      "id": "invoice.view_own",
+      "intent": "Allow a customer to view only their own invoice.",
+      "actor": "customer",
+      "reads": ["invoice"],
+      "outputs": [
+        { "id": "invoice", "type": "json", "required": true }
+      ],
+      "guards": ["invoice.customer_id == actor.customer_id"],
+      "effects": ["audit.log:invoice.view_own"],
+      "invariants": ["customer cannot access invoices owned by another customer"],
+      "tests": ["deny access to another customer invoice", "allow access to own invoice"]
+    }
+  ]
+}
