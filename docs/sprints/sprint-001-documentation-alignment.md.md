@@ -1,4 +1,4 @@
-# Sprint 001 — Documentation Alignment & Project State Freeze
+# Sprint 001 - Documentation Alignment & Philosophy
 
 ## Status
 
@@ -8,183 +8,150 @@ Ready
 
 Documentation-only
 
-## Sprint Goal
+## Goal
 
-Bring AION documentation in line with the current implemented state of the project.
+Implement Sprint 001 - Documentation Alignment & Philosophy.
 
-The key milestone to document is:
+This sprint aligns AION documentation with the current project philosophy:
+
+- AION is not merely an AI-native IR
+- AION is a contract-first compiler for AI-assisted software development
+- human-readable source code is not the trust boundary
+- behavioral verification is the trust boundary
+
+## Current Proof
 
 ```text
 AION IR -> executable TypeScript runtime -> executed behavior smoke test passed
-````
+```
 
-This sprint should make the project understandable for:
+## Current Implemented Capabilities
 
-* new developers
-* Codex
-* AI coding agents
-* future contributors
-* the project owner
+- AION JSON IR
+- parser
+- JSON Schema validation
+- semantic validation
+- compile plan
+- runtime manifest
+- CLI
+- TypeScript target
+- SQL target
+- Mermaid graph target
+- AIONX native execution plan target
+- AIONX run inspection
+- `--out` / `-o` output file support
+- `executable-ts` target
+- self-contained in-memory TypeScript runtime generation for the car rental vertical slice
 
-## Why This Sprint Matters
+## Verified Behavior In Current Proof
 
-AION has moved beyond static artifact generation.
-
-The project now supports:
-
-* AION JSON IR
-* parser
-* JSON Schema validation
-* semantic validation
-* compile plan
-* runtime manifest
-* TypeScript target
-* SQL target
-* Mermaid target
-* AIONX native execution plan
-* AIONX run inspection
-* `--out` output support
-* executable TypeScript runtime generation for a narrow vertical slice
-
-The documentation must reflect this current reality before new runtime work continues.
+- admin can create invoice
+- customer cannot create invoice
+- negative amount is rejected
+- invoice total is calculated
+- invoice is stored in memory
+- customer can view own invoice
+- customer cannot view another customer's invoice
+- audit log is written
 
 ## Scope
 
-This sprint is documentation-only.
-
 Allowed changes:
 
-* `README.md`
-* `docs/vision.md`
-* `docs/architecture.md`
-* `docs/schema.md`
-* `docs/runtime.md`
-* `docs/executable-ts.md`
-* `docs/skills/aion-codex-skill.md`
-* optional: `docs/token-management.md`
-* optional: `docs/sprints/README.md`
+- `README.md`
+- `docs/vision.md`
+- `docs/architecture.md`
+- `docs/runtime.md`
+- `docs/executable-ts.md`
+- `docs/skills/aion-codex-skill.md`
+- `docs/token-management.md`
+- `docs/roadmap.md`
 
 Not allowed:
 
-* compiler source changes
-* runtime source changes
-* CLI behavior changes
-* dependency changes
-* `package-lock.json` changes
+- compiler source changes
+- runtime source changes
+- CLI behavior changes
+- dependency changes
+- `package.json` changes
+- `package-lock.json` changes
 
-## Tasks
+## Required Positioning
+
+Use this framing:
+
+```text
+AION is a contract-first compiler for AI-assisted software development.
+
+It turns human intent into validated behavioral contracts, machine-native execution plans, executable artifacts, and behavior verification reports.
+```
+
+Include this trust-boundary statement:
+
+```text
+Human-readable source code is not the trust boundary.
+Behavioral verification is the trust boundary.
+```
+
+## Documentation Targets
 
 ### README
 
-* [ ] Keep README focused on the main project overview.
-* [ ] Explain current AION capabilities.
-* [ ] Add current proof statement.
-* [ ] Add install/build instructions.
-* [ ] Add car rental example commands.
-* [ ] Add compile target examples.
-* [ ] Add AIONX generation and inspection commands.
-* [ ] Add executable-ts proof command.
-* [ ] Add documentation links.
+- explain what AION is today
+- explain that AION is not just an AI-native IR
+- explain the current proof
+- document quick start
+- document the car rental proof
+- document TypeScript, SQL, Mermaid, AIONX, and `executable-ts`
+- explain why `--out` should be used
+- list current limitations
+- link to supporting docs
 
 ### Vision
 
-* [ ] Explain AION as a behavioral contract layer.
-* [ ] Clarify that AION is not just a code generator.
-* [ ] Explain the evolved thesis from static artifacts to executable behavior.
-* [ ] Include the current executable TypeScript proof.
+- explain that AION is not primarily a programming language for humans
+- explain that AION is not merely an IR
+- explain the machine-oriented software generation and verification path
+- include the human intent to trusted behavior flow
 
 ### Architecture
 
-* [ ] Document the current pipeline:
-
-```text
-Human Prompt
-  -> AI interpretation
-  -> AION IR
-  -> JSON Schema validation
-  -> Semantic Validator
-  -> Compile Plan
-  -> Runtime Manifest
-  -> Target Compilers
-  -> AIONX
-  -> Runtime Inspector
-  -> Executable Runtime Target
-  -> Smoke Tests
-```
-
-* [ ] Document current compiler targets.
-* [ ] Document AIONX.
-* [ ] Document runtime inspector.
-* [ ] Document executable-ts proof.
-* [ ] Clearly separate implemented architecture from future architecture.
-
-### Schema
-
-* [ ] Clarify schema validation as the first gate.
-* [ ] Explain what schema validation checks.
-* [ ] Explain what semantic validation checks.
-* [ ] Mention executable targets still depend on valid IR.
+- distinguish the architecture layers
+- separate machine-facing outputs from human-facing outputs
+- explain why internal machine representations may become less human-readable over time
 
 ### Runtime
 
-* [ ] Create or update `docs/runtime.md`.
-* [ ] Explain current runtime status.
-* [ ] Document AIONX generation.
-* [ ] Document `aion run` inspection.
-* [ ] Document executable-ts as a generated runtime proof.
-* [ ] List current runtime limitations.
-* [ ] List next runtime steps.
+- document current runtime state
+- document AIONX generation and inspection
+- document `executable-ts` as proof
+- explain near-term and long-term runtime goals
 
 ### Executable TypeScript
 
-* [ ] Create or update `docs/executable-ts.md`.
-* [ ] Explain purpose of `executable-ts`.
-* [ ] Document command usage.
-* [ ] Explain generated runtime features.
-* [ ] Document supported operations:
-
-  * `invoice.create`
-  * `invoice.view_own`
-* [ ] Document verified smoke-test behavior.
-* [ ] Explain current limitations.
+- clarify that `executable-ts` is a proof target
+- clarify that success is measured by behavioral verification
+- clarify that generated code is not the trust boundary
 
 ### Codex Skill
 
-* [ ] Create or update `docs/skills/aion-codex-skill.md`.
-* [ ] Start with setup and installation.
-* [ ] Explain local CLI usage.
-* [ ] Explain why `npm run build` is required after source changes.
-* [ ] Explain AION-first workflow.
-* [ ] Explain rules for Codex.
-* [ ] Explain definition of done.
-* [ ] Explain current limitations.
+- align agent workflow around behavior verification
+- prefer reports, tests, smoke output, and scenario results
+- add a machine-oriented workflow section
 
 ### Token Management
 
-* [ ] Add `docs/token-management.md` if included in this sprint.
-* [ ] Or explicitly defer token management to a future sprint.
+- reflect compact machine-native representation as a future goal
+- describe token reduction through contracts, AIONX, scenario reports, and repair reports
 
-### Sprint Docs
+### Roadmap
 
-* [ ] Add `docs/sprints/sprint-001-documentation-alignment.md`.
-* [ ] Optionally add `docs/sprints/README.md`.
+- create `docs/roadmap.md`
+- shift roadmap toward verification, execution, repair, compact machine plans, and ecosystem targets
 
-## Acceptance Criteria
+## Validation
 
-* [ ] README explains current AION capabilities clearly.
-* [ ] Docs state that AION can now generate executable TypeScript behavior for a vertical slice.
-* [ ] Docs clearly state that `aion run` is currently inspector-level.
-* [ ] Docs clearly state that `executable-ts` is experimental.
-* [ ] Docs clearly state that `executable-ts` is not a full app generator.
-* [ ] Runtime docs explain AIONX, run inspection, and executable-ts.
-* [ ] Architecture docs include current implemented layers.
-* [ ] Codex skill explains how AI agents should work with AION.
-* [ ] All generated artifact examples use `--out`.
-* [ ] No compiler/runtime behavior changed.
-* [ ] `package.json` unchanged.
-* [ ] `package-lock.json` unchanged.
-
-## Validation Commands
+Run:
 
 ```bash
 npm run typecheck
@@ -195,39 +162,13 @@ npm run build
 ## PR Title
 
 ```text
-docs: update AION project documentation
+docs: align AION philosophy and roadmap
 ```
 
 ## PR Summary
 
-```md
-## Summary
-
-- Updates documentation to reflect current AION capabilities.
-- Documents AIONX generation, AIONX run inspection, `--out` support, and executable-ts.
-- Adds runtime documentation.
-- Adds executable TypeScript target documentation.
-- Adds Codex/AI agent workflow guidance.
-
-## Validation
-
-- npm run typecheck
-- npm run schema:check
-- npm run build
-
-## Notes
-
-- Documentation-only change.
-- No compiler/runtime behavior changed.
-- package.json unchanged.
-- package-lock.json unchanged.
-```
-
-## Out of Scope
-
-* generic guard evaluator
-* operation dry-run
-* executable-ts refactor
-* SQL relationships
-* app generation
-* runtime adapters
+- reframes AION from AI-native IR toward contract-first machine-oriented software generation
+- documents behavioral verification as the trust boundary
+- documents current `executable-ts` proof
+- adds updated roadmap
+- no compiler/runtime behavior changed

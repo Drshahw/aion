@@ -1,43 +1,42 @@
 # AION Architecture
 
-AION is a compiler-style stack for turning human intent into validated, generated, inspectable, and eventually executable software behavior.
+AION is a layered pipeline for turning human intent into validated behavior, machine-native execution plans, executable artifacts, and behavior reports.
 
-The current architecture is:
+Human-readable source code is not the trust boundary.
+Behavioral verification is the trust boundary.
+
+## Layer Overview
 
 ```text
-Human Prompt
-  -> AI interpretation
-  -> AION IR
-  -> JSON Schema validation
-  -> Semantic Validator
-  -> Compile Plan
-  -> Runtime Manifest
-  -> Target Compilers
-  -> AIONX
-  -> Runtime Inspector
-  -> Executable Runtime Target
-  -> Smoke Tests
+Human Intent Layer
+  -> AION Contract Layer
+  -> Validation Layer
+  -> Target Generation Layer
+  -> AIONX Machine Plan Layer
+  -> Executable Artifact Layer
+  -> Behavioral Verification Layer
+  -> AI Debug/Repair Layer
+  -> Human Behavior Review Layer
 ```
 
-## 1. Human prompt
+## 1. Human Intent Layer
 
-AION starts from human intent.
+This layer starts with the human describing desired system behavior:
 
-The human describes what the system should do, who can do it, what data exists, what rules apply, and what behavior must be verified.
+- who can act
+- what data exists
+- what operations are allowed
+- what rules must hold
+- what outputs and side effects matter
+- what scenarios should pass or fail
 
-AION does not require the human to write implementation code directly.
+The human does not need to manually author final implementation code.
 
-## 2. AI interpretation
+## 2. AION Contract Layer
 
-An AI agent can translate the human request into AION IR.
+This layer captures behavior in AION JSON IR.
 
-The AI should not jump directly from prompt to application code. It should first create or update the AION behavioral contract.
-
-## 3. AION IR
-
-The AION IR is the stable internal shape of an AION program.
-
-Current primitives include:
+Current contract primitives include:
 
 - metadata
 - actors
@@ -53,313 +52,156 @@ Current primitives include:
 - invariants
 - tests
 
-The IR is currently represented as JSON.
+This is the main human/AI reviewable contract layer.
 
-## 4. JSON Schema validation
+## 3. Validation Layer
 
-AION includes a formal JSON Schema for v0.1 programs.
+This layer checks whether the contract is structurally and semantically valid before generation.
 
-Schema validation is the first gate. It checks the structural shape of the IR before semantic validation or target generation.
+It currently includes:
 
-It verifies things such as:
+- JSON Schema validation
+- semantic validation
+- compile plan generation
+- runtime manifest generation
 
-- AION version
-- program kind
-- required metadata
-- actor shape
-- entity shape
-- field shape
-- operation shape
-- allowed scalar types
-- allowed actor roles
-- unknown top-level properties
+Validation exists to stop unsupported or inconsistent behavior before targets are emitted.
 
-Schema validation does not replace semantic validation.
+## 4. Target Generation Layer
 
-## 5. Semantic validator
+This layer lowers the contract into target artifacts.
 
-The semantic validator checks cross-reference and behavioral issues that JSON Schema cannot fully verify.
+Current targets include:
 
-It checks issues such as:
+- TypeScript
+- SQL
+- Mermaid
+- AIONX
+- `executable-ts`
 
-- unsupported AION version
-- unsupported program kind
-- duplicate actor ids
-- duplicate entity ids
-- duplicate field ids
-- duplicate operation ids
-- unknown operation actors
-- unknown read/write entities
-- invalid scalar types
-- write operations without audit effects
-- operations without guards
-- operations without test expectations
+These targets serve different audiences:
 
-The validator produces diagnostics with errors and warnings.
+- some are human-facing summaries
+- some are implementation artifacts
+- some are machine-facing execution plans
 
-Target generation should not happen until semantic validation passes.
+## 5. AIONX Machine Plan Layer
 
-## 6. Compile plan
+AIONX is the current machine-native execution plan layer.
 
-The compile plan is not final application code.
+It is meant for parseability, determinism, validation, execution planning, and future repair workflows.
 
-It is a structured list of generation steps derived from the AION IR. It tells the compiler what categories of artifacts can be produced from the program.
+Today AIONX contains machine-readable operation, entity, guard, effect, and test metadata. Over time, it may become more compact and less human-readable.
 
-The current compile plan includes steps for:
+That is acceptable.
+Internal machine representations should optimize for machines first.
 
-- schemas
-- operations
-- guards
-- effects
-- tests
+## 6. Executable Artifact Layer
 
-The compile plan is useful for humans and agents because it makes the compiler's intended work visible before generating target artifacts.
+This layer produces executable outputs that prove or implement behavior.
 
-## 7. Runtime manifest
+Today the main proof artifact is the `executable-ts` target, which generates a self-contained in-memory TypeScript runtime for the car rental vertical slice.
 
-The runtime manifest summarizes executable capabilities inferred from the AION program.
+This layer is not about preserving a human-friendly abstraction.
+It is about producing behavior that can run.
 
-It includes:
+## 7. Behavioral Verification Layer
 
-- program name
-- version
-- actors
-- entities
-- operations
-- inferred capabilities
+This layer is where trust is established.
 
-Current inferred capabilities include patterns such as:
+Human-facing outputs should center on:
 
-- read
-- write
-- guarded execution
-- audit log
-- test generation
+- behavior reports
+- scenario results
+- traces
+- graphs
+- summaries
+- smoke test outcomes
 
-The manifest helps describe what a future runtime or generated runtime must support.
+Machine-facing outputs should optimize for:
 
-## 8. Target compilers
+- parseability
+- determinism
+- validation
+- execution
+- repair
 
-AION currently includes multiple compiler/export targets.
+The system should be trusted because behavior passes verification, not because generated source is pleasant to read.
 
-### TypeScript target
+## 8. AI Debug/Repair Layer
 
-Generates TypeScript interfaces and operation stubs from AION IR.
+This layer is where AI agents inspect failures and decide what to patch.
 
-Use:
+The repair target may be:
 
-```bash
-node dist/src/cli.js compile typescript examples/car-rental-system.aion.json --out generated.ts
-```
+- the AION contract
+- a compiler target
+- a runtime path
+- a generated artifact
+- a test or scenario definition
 
-### SQL target
+The agent should prefer evidence from behavior reports, traces, smoke output, and scenario failures over source-level guesswork.
 
-Generates SQL DDL from AION entities.
+## 9. Human Behavior Review Layer
 
-Use:
+The human remains the final judge of the system, but the review surface should be behavior-oriented:
 
-```bash
-node dist/src/cli.js compile sql examples/car-rental-system.aion.json --out generated.sql
-```
+- did the scenario pass
+- did the guard hold
+- did the output match
+- did the trace show the right effect
+- did the verification report align with intent
 
-### Mermaid target
+The human should not need to manually inspect internal machine representations to establish trust.
 
-Generates a visual behavior graph.
-
-Use:
-
-```bash
-node dist/src/cli.js compile mermaid examples/car-rental-system.aion.json --out system.mmd
-```
-
-or:
-
-```bash
-node dist/src/cli.js graph examples/car-rental-system.aion.json --out system.mmd
-```
-
-### AIONX target
-
-Generates a native AION execution plan.
-
-Use:
-
-```bash
-node dist/src/cli.js compile aionx examples/car-rental-system.aion.json --out app.aionx.json
-```
-
-### executable-ts target
-
-Generates a self-contained in-memory executable TypeScript runtime for a narrow vertical slice.
-
-Use:
-
-```bash
-node dist/src/cli.js compile executable-ts examples/car-rental-system.aion.json --out generated-runtime.ts
-```
-
-This target is experimental, but it proves that AION IR can generate executable behavior.
-
-## 9. AIONX native execution plan
-
-AIONX is the current native AION execution plan format.
-
-It is machine-readable and includes:
-
-- format
-- version
-- program metadata
-- capabilities
-- entities
-- operations
-- reads
-- writes
-- inputs
-- outputs
-- guards
-- effects
-- invariants
-- tests
-- execution metadata
-
-Current AIONX operation execution metadata is intentionally deferred and stub-level.
-
-That means AIONX is currently a plan format, not a full executor.
-
-## 10. Runtime inspector
-
-The CLI command:
-
-```bash
-node dist/src/cli.js run app.aionx.json
-```
-
-currently inspects an AIONX execution plan.
-
-It validates basic AIONX structure and prints a readable summary, including:
-
-- program name
-- format and version
-- entity count
-- operation count
-- capabilities
-- operations
-- actors
-- reads
-- writes
-- guard counts
-- effects
-
-This is not full business logic execution yet.
-
-The current runtime inspector is a bridge toward future runtime execution.
-
-## 11. Executable TypeScript proof
-
-The `executable-ts` target generates a self-contained TypeScript runtime.
-
-Current generated runtime features include:
-
-- in-memory store
-- `resetStore`
-- `seedCustomer`
-- `seedVehicle`
-- `invoiceCreate`
-- `invoiceViewOwn`
-- audit log entries
-- guard checks
-
-The current scope is intentionally narrow and focused on the car rental example.
-
-Supported operations:
-
-- `invoice.create`
-- `invoice.view_own`
-
-Unsupported operation patterns are generated as safe stubs that throw an error.
-
-This proves that AION can generate executable operation behavior from IR, not only static artifacts.
-
-## 12. Smoke tests
-
-The executable TypeScript smoke test verifies generated runtime behavior.
-
-Run:
-
-```bash
-npm run compiler:executable-ts:smoke
-```
-
-The smoke test compiles the car rental AION IR into a generated runtime, compiles that runtime, imports it, and executes generated behavior.
-
-Verified behavior includes:
-
-- generated runtime exports expected functions
-- admin can create invoice
-- invoice total is calculated
-- invoice is stored
-- audit log is written
-- non-admin customer cannot create invoice
-- negative amount is rejected
-- customer can view own invoice
-- customer cannot view another customer's invoice
-- invoice view audit log is written
-
-## Current architecture summary
+## Current Implemented Pipeline
 
 ```text
-AION JSON IR
-  -> parse
+Human intent
+  -> AI-authored AION JSON IR
   -> schema validation
   -> semantic validation
   -> compile plan
   -> runtime manifest
-  -> target artifacts
+  -> target generation
       -> TypeScript
       -> SQL
       -> Mermaid
       -> AIONX
       -> executable-ts
-  -> inspection / smoke tests
+  -> AIONX inspection
+  -> executable behavior smoke test
 ```
 
-## Current limitations
+## Current Proof
 
-AION is still experimental.
+The current proof is:
 
-Current limitations:
+```text
+AION IR -> executable TypeScript runtime -> executed behavior smoke test passed
+```
+
+Verified behavior currently includes:
+
+- admin can create invoice
+- customer cannot create invoice
+- negative amount is rejected
+- invoice total is calculated
+- invoice is stored in memory
+- customer can view own invoice
+- customer cannot view another customer's invoice
+- audit log is written
+
+## Current Limitations
+
+Current architecture limits include:
 
 - AIONX run is inspector-level only
 - AIONX does not execute business logic yet
-- executable-ts is prototype-level
-- executable-ts currently supports a narrow car rental invoice slice
-- no real database adapter exists yet
-- no generic full application generator exists yet
-- guard evaluation is not generic yet
-- persistence is not implemented in the generated runtime
-
-## Future runtime architecture
-
-Future runtime work may add:
-
-- generic guard evaluator
-- operation dry-run
-- generic operation execution
-- storage adapters
-- audit/event log runtime
-- deterministic replay
-- policy evaluation
-- generated test execution
-- adapter-based app integration
-
-The intended direction is:
-
-```text
-AION IR
-  -> AIONX
-  -> runtime executor
-  -> storage adapter
-  -> audit/event log
-  -> deterministic replay
-  -> verified behavior
-```
+- `executable-ts` is experimental and vertical-slice focused
+- there is no generic behavioral verification layer yet
+- there is no AI repair loop yet
+- there is no compact machine-native AIONX yet
+- there is no database adapter yet
+- there is no full application generator yet
+- there is no production runtime yet

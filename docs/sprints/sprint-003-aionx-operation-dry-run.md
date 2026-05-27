@@ -1,4 +1,4 @@
-# Sprint 003 — AIONX Operation Dry-Run
+# Sprint 003 - AIONX Operation Dry-Run / Execution
 
 ## Status
 
@@ -6,21 +6,80 @@ Planned
 
 ## Type
 
-Runtime / CLI
+Technical sprint building on Sprint 002 behavioral verification
 
-## Sprint Goal
+## Goal
 
-Add operation-level dry-run support to `aion run`.
+Implement Sprint 003 - AIONX Operation Dry-Run / Execution.
 
-The goal is to move AIONX from system-level inspection toward operation-level runtime verification.
+This sprint builds on Sprint 002 - Behavioral Verification Layer.
+
+## Project Philosophy
+
+AION is not primarily optimized for humans manually reading generated code.
+AION is optimized for machine generation, validation, execution, testing, tracing, and repair.
+
+Human-readable source code is not the trust boundary.
+Behavioral verification is the trust boundary.
+
+Humans should judge AION output by:
+
+- behavior reports
+- scenario results
+- guard pass/fail results
+- expected vs actual outputs
+- effects and audit previews
+- smoke tests
+- traces
+
+AI agents should debug and repair failures based on verification output.
+
+## Current Implemented Capabilities
+
+- AION JSON IR
+- parser
+- JSON Schema validation
+- semantic validation
+- compile plan
+- runtime manifest
+- CLI
+- TypeScript target
+- SQL target
+- Mermaid graph target
+- AIONX native execution plan target
+- AIONX run inspection
+- `--out` / `-o` output file support
+- `executable-ts` target
+- `executable-ts` generates a self-contained in-memory TypeScript runtime for the car rental vertical slice
+- smoke test confirms generated runtime behavior executes
+
+## Current Proof
+
+```text
+AION IR -> executable TypeScript runtime -> executed behavior smoke test passed
+```
+
+## Sprint 002 Dependency
+
+Sprint 002 should already provide:
+
+- `evaluateGuardExpression`
+- `evaluateOperationGuards`
+- `formatBehaviorVerificationReport`
+- `AionGuardEvaluation`
+- `AionBehaviorVerificationReport`
+
+## Sprint 003 Objective
+
+Extend `aion run` so it can dry-run a specific AIONX operation using a provided context JSON file.
 
 Current behavior:
 
 ```bash
 node dist/src/cli.js run app.aionx.json
-````
+```
 
-This prints a summary of the AIONX execution plan.
+This inspects the full AIONX plan and prints a summary.
 
 Desired new behavior:
 
@@ -28,84 +87,45 @@ Desired new behavior:
 node dist/src/cli.js run app.aionx.json --operation invoice.create --context examples/contexts/admin-invoice-create.json
 ```
 
-This should evaluate the selected operation’s guards against a provided context and print whether the dry-run passed or failed.
+or:
 
-## Why This Sprint Matters
+```bash
+node dist/src/cli.js run app.aionx.json -op invoice.create -c examples/contexts/admin-invoice-create.json
+```
 
-AION currently can inspect AIONX plans, but it cannot yet answer:
+This should:
+
+- read the AIONX file
+- find the requested operation
+- read the context JSON
+- evaluate the operation guards using the Sprint 002 behavioral verification layer
+- preview operation effects
+- print a behavior verification report
+- return a clear pass/fail result
+
+## Core Constraint
+
+This is not full runtime execution.
+This is not database execution.
+This is not a storage adapter.
+This should not mutate state.
+This should not perform effects.
+Effects should be previewed only.
+
+This is operation-level behavioral verification from AIONX.
+
+It should answer:
 
 ```text
-Can this actor execute this operation with this input/context?
+Can this actor/context satisfy this operation's guards?
 ```
 
-Sprint 003 should add that missing bridge.
+## Expected Output
 
-This is not full execution yet. It should not write to a database, mutate storage, or perform real effects.
-
-It should only:
+Passing example:
 
 ```text
-AIONX operation
-  -> context JSON
-  -> guard evaluation
-  -> effects preview
-  -> dry-run pass/fail result
-```
-
-## Current Context
-
-AION currently supports:
-
-* AION IR
-* validation
-* compile plan
-* runtime manifest
-* AIONX target
-* AIONX run inspector
-* executable-ts proof
-* `--out` support
-
-Sprint 002 is expected to add:
-
-* Generic Guard Evaluator
-* safe comparison evaluation
-* support for actor/input/entity paths
-
-Sprint 003 should use that evaluator.
-
-## Scope
-
-Add operation-level dry-run mode to:
-
-```bash
-node dist/src/cli.js run <file.aionx.json>
-```
-
-New supported flags:
-
-```bash
---operation <operation-id>
---context <context.json>
-```
-
-Optional short forms:
-
-```bash
--op <operation-id>
--c <context.json>
-```
-
-Example:
-
-```bash
-node dist/src/cli.js run app.aionx.json --operation invoice.create --context examples/contexts/admin-invoice-create.json
-```
-
-## Expected Output — Passing Case
-
-```text
-Operation: invoice.create
-Actor: admin
+Behavior: invoice.create
 
 Guards:
 ✅ actor.role == admin
@@ -117,14 +137,13 @@ Effects:
 - audit.log:invoice.create
 
 Result:
-dry-run passed
+behavior verification passed
 ```
 
-## Expected Output — Failing Case
+Failing example:
 
 ```text
-Operation: invoice.create
-Actor: admin
+Behavior: invoice.create
 
 Guards:
 ❌ actor.role == admin
@@ -136,32 +155,150 @@ Effects:
 - audit.log:invoice.create
 
 Result:
-dry-run failed
+behavior verification failed
 ```
 
-## Supported Example Operations
+## Scope
 
-Use the current car rental example.
+Add operation-level dry-run to `run`.
 
-Operations:
+Supported flags:
 
 ```text
-invoice.create
-invoice.view_own
+--operation <operation-id>
+-op <operation-id>
+
+--context <context-json-path>
+-c <context-json-path>
 ```
 
-## Example Context Files
+Required behavior:
+
+A) If `run` is called without `--operation`:
+Keep existing AIONX inspector behavior unchanged.
+
+B) If `run` is called with `--operation`:
+Require `--context`.
+
+C) If context is missing:
+
+```text
+AION error: Missing --context for operation dry-run.
+```
+
+Exit 1.
+
+D) If operation does not exist:
+
+```text
+AION error: Operation not found: <operation-id>
+```
+
+Exit 1.
+
+E) If context JSON is invalid:
+
+```text
+AION error: <clear JSON parse/read error>
+```
+
+Exit 1.
+
+F) If AIONX file is invalid:
+Existing AIONX validation behavior should continue to fail clearly.
+
+## Required Files
 
 Create:
 
 ```text
+src/runtime/dryRunAionOperation.ts
 examples/contexts/admin-invoice-create.json
 examples/contexts/customer-invoice-create-denied.json
 examples/contexts/customer-view-own-invoice.json
 examples/contexts/customer-view-other-invoice-denied.json
+scripts/dry-run-aionx-smoke.mjs
 ```
 
-### `admin-invoice-create.json`
+## Suggested Exports
+
+`src/runtime/dryRunAionOperation.ts`:
+
+```ts
+export interface AionOperationDryRunResult {
+  operationId: string;
+  passed: boolean;
+  guards: AionGuardEvaluation[];
+  effects: string[];
+}
+
+export function dryRunAionOperation(
+  plan: unknown,
+  operationId: string,
+  context: Record<string, unknown>
+): AionOperationDryRunResult;
+
+export function formatAionOperationDryRun(
+  result: AionOperationDryRunResult
+): string;
+```
+
+## Implementation Notes
+
+- validate that plan is an AIONX object
+- require `plan.format === "aionx"`
+- require `plan.version === "0.1"`
+- require operations array
+- find operation by id
+- operation guards should come from `operation.guards`
+- operation effects should come from `operation.effects`
+- use `evaluateOperationGuards` from Sprint 002
+- use `formatBehaviorVerificationReport` from Sprint 002 if practical
+- passed means all guards passed
+- do not execute writes
+- do not execute effects
+- do not call `parseAionProgram` from the run path
+
+## CLI Updates
+
+Update:
+
+```text
+src/cli.ts
+```
+
+Add parsing helpers if needed:
+
+- `resolveOperationId(args: string[]): string | undefined`
+- `resolveContextPath(args: string[]): string | undefined`
+
+Ensure `resolveFilePath` for run ignores:
+
+- `--operation`
+- `-op`
+- the value after `--operation` / `-op`
+- `--context`
+- `-c`
+- the value after `--context` / `-c`
+
+Keep existing `run app.aionx.json` behavior unchanged.
+
+## Example Context Files
+
+Create directory:
+
+```text
+examples/contexts/
+```
+
+Add:
+
+1. `examples/contexts/admin-invoice-create.json`
+2. `examples/contexts/customer-invoice-create-denied.json`
+3. `examples/contexts/customer-view-own-invoice.json`
+4. `examples/contexts/customer-view-other-invoice-denied.json`
+
+### admin-invoice-create.json
 
 ```json
 {
@@ -177,13 +314,13 @@ examples/contexts/customer-view-other-invoice-denied.json
 }
 ```
 
-Expected result:
+Expected:
 
 ```text
-dry-run passed
+behavior verification passed
 ```
 
-### `customer-invoice-create-denied.json`
+### customer-invoice-create-denied.json
 
 ```json
 {
@@ -199,13 +336,13 @@ dry-run passed
 }
 ```
 
-Expected result:
+Expected:
 
 ```text
-dry-run failed
+behavior verification failed
 ```
 
-### `customer-view-own-invoice.json`
+### customer-view-own-invoice.json
 
 ```json
 {
@@ -221,13 +358,13 @@ dry-run failed
 }
 ```
 
-Expected result:
+Expected:
 
 ```text
-dry-run passed
+behavior verification passed
 ```
 
-### `customer-view-other-invoice-denied.json`
+### customer-view-other-invoice-denied.json
 
 ```json
 {
@@ -243,104 +380,143 @@ dry-run passed
 }
 ```
 
-Expected result:
+Expected:
 
 ```text
-dry-run failed
+behavior verification failed
 ```
 
-## Tasks
+## Smoke Test
 
-### Runtime Dry-Run
-
-* [ ] Create operation dry-run helper.
-* [ ] Read AIONX file.
-* [ ] Validate basic AIONX format.
-* [ ] Find operation by id.
-* [ ] Load context JSON.
-* [ ] Evaluate operation guards using Generic Guard Evaluator.
-* [ ] Collect effects.
-* [ ] Return pass/fail result.
-
-### CLI
-
-* [ ] Extend `run` command with `--operation`.
-* [ ] Extend `run` command with `--context`.
-* [ ] Support `-op` alias if practical.
-* [ ] Support `-c` alias if practical.
-* [ ] Keep existing `aion run app.aionx.json` inspector behavior unchanged.
-* [ ] If `--operation` is provided without `--context`, fail clearly.
-* [ ] If operation does not exist, fail clearly.
-* [ ] If context JSON is invalid, fail clearly.
-
-### Example Contexts
-
-* [ ] Add admin invoice create context.
-* [ ] Add customer invoice create denied context.
-* [ ] Add customer view own invoice context.
-* [ ] Add customer view other invoice denied context.
-
-### Tests / Smoke
-
-* [ ] Add dry-run smoke script.
-* [ ] Compile AIONX from car rental example.
-* [ ] Run passing `invoice.create` dry-run.
-* [ ] Run failing `invoice.create` dry-run.
-* [ ] Run passing `invoice.view_own` dry-run.
-* [ ] Run failing `invoice.view_own` dry-run.
-* [ ] Assert output includes guard expressions.
-* [ ] Assert output includes `dry-run passed` or `dry-run failed`.
-
-### Public API
-
-* [ ] Export operation dry-run helper if appropriate.
-* [ ] Export dry-run result types if appropriate.
-
-### Documentation
-
-* [ ] Update `docs/runtime.md`.
-* [ ] Update README only if needed.
-* [ ] Document that dry-run evaluates guards only.
-* [ ] Document that dry-run does not execute writes or effects.
-
-## Proposed Files
+Create:
 
 ```text
-src/runtime/dryRunAionOperation.ts
 scripts/dry-run-aionx-smoke.mjs
-examples/contexts/admin-invoice-create.json
-examples/contexts/customer-invoice-create-denied.json
-examples/contexts/customer-view-own-invoice.json
-examples/contexts/customer-view-other-invoice-denied.json
 ```
 
-Potentially updated:
+The smoke test should:
+
+A) Compile AIONX:
+
+```bash
+node dist/src/cli.js compile aionx examples/car-rental-system.aion.json --out <tmp>/app.aionx.json
+```
+
+B) Run passing `invoice.create` dry-run and assert output includes:
+
+- `Behavior: invoice.create`
+- `✅ actor.role == admin`
+- `✅ rent_amount >= 0`
+- `audit.log:invoice.create`
+- `behavior verification passed`
+
+C) Run failing `invoice.create` dry-run and assert output includes:
+
+- `Behavior: invoice.create`
+- `❌ actor.role == admin`
+- `behavior verification failed`
+
+D) Run passing `invoice.view_own` dry-run and assert output includes:
+
+- `Behavior: invoice.view_own`
+- `✅ invoice.customer_id == actor.customer_id`
+- `audit.log:invoice.view_own`
+- `behavior verification passed`
+
+E) Run failing `invoice.view_own` dry-run and assert output includes:
+
+- `Behavior: invoice.view_own`
+- `❌ invoice.customer_id == actor.customer_id`
+- `behavior verification failed`
+
+F) Confirm inspector mode still works and assert output includes:
+
+- `Program: car-rental-billing`
+- `Format: aionx@0.1`
+- `Operations: 2`
+
+## Package Script
+
+Update `package.json`:
+
+```json
+"runtime:dry-run:smoke": "node scripts/dry-run-aionx-smoke.mjs"
+```
+
+Do not add dependencies.
+Do not modify `package-lock.json` unless dependencies changed.
+
+## CI Update
+
+Update:
 
 ```text
-src/cli.ts
-src/index.ts
-package.json
 .github/workflows/ci.yml
-README.md
-docs/runtime.md
+```
+
+Add:
+
+```yaml
+- name: AIONX dry-run smoke
+  run: npm run runtime:dry-run:smoke
+```
+
+Place it near other runtime and compiler smoke tests.
+
+## Public API
+
+Update:
+
+```text
+src/index.ts
+```
+
+Export:
+
+- `dryRunAionOperation`
+- `formatAionOperationDryRun`
+- `AionOperationDryRunResult`
+
+## Documentation Updates
+
+1. `docs/runtime.md`
+2. `docs/architecture.md`
+3. `README.md`
+
+Keep README concise.
+
+Document that:
+
+- `aion run` can inspect full AIONX plans
+- with `--operation` and `--context`, it can verify one operation's guards
+- it produces behavior verification reports
+- effects are previewed, not executed
+- this is not full runtime execution
+
+Example command:
+
+```bash
+node dist/src/cli.js run app.aionx.json --operation invoice.create --context examples/contexts/admin-invoice-create.json
 ```
 
 ## Acceptance Criteria
 
-* [ ] `aion run app.aionx.json` still works as inspector.
-* [ ] `aion run app.aionx.json --operation invoice.create --context ...` works.
-* [ ] Passing contexts return `dry-run passed`.
-* [ ] Failing contexts return `dry-run failed`.
-* [ ] Guard expressions are printed with pass/fail status.
-* [ ] Effects are printed but not executed.
-* [ ] Missing operation returns clear error.
-* [ ] Missing context returns clear error.
-* [ ] Invalid context JSON returns clear error.
-* [ ] No database writes happen.
-* [ ] No business logic execution happens beyond guard evaluation.
-* [ ] Existing executable-ts smoke test still passes.
-* [ ] Existing AIONX run inspector smoke test still passes.
-* [ ] `package-lock.json` unchanged unless dependencies changed.
+- `aion run app.aionx.json` still works as inspector
+- `aion run app.aionx.json --operation invoice.create --context ...` works
+- passing contexts produce `behavior verification passed`
+- failing contexts produce `behavior verification failed`
+- guard pass/fail lines are printed
+- effects are previewed
+- no effects are executed
+- no database or storage mutation occurs
+- missing context fails clearly
+- missing operation fails clearly
+- invalid JSON fails clearly
+- smoke test covers passing and failing cases
+- existing `executable-ts` smoke test still passes
+- existing AIONX run smoke test still passes
+- no dependencies added
+- `package-lock.json` unchanged unless dependencies changed
 
 ## Validation Commands
 
@@ -349,20 +525,10 @@ npm run typecheck
 npm run schema:check
 npm run build
 npm test
-npm run runtime:aionx:smoke
-npm run out:smoke
-npm run compiler:executable-ts:smoke
 npm run runtime:dry-run:smoke
-```
-
-## Suggested Technical Proof
-
-```text
-AIONX operation
-  -> context JSON
-  -> generic guard evaluator
-  -> guard pass/fail report
-  -> dry-run result
+npm run runtime:aionx:smoke
+npm run compiler:executable-ts:smoke
+npm run out:smoke
 ```
 
 ## PR Title
@@ -373,40 +539,21 @@ feat: add AIONX operation dry-run
 
 ## PR Summary
 
-```md
-## Summary
+- adds operation-level dry-run to `aion run`
+- supports `--operation` and `--context`
+- uses behavioral verification layer to evaluate guards
+- previews effects but does not execute them
+- adds example contexts and smoke coverage
+- keeps inspector mode unchanged
+- no full runtime execution added
+- no dependencies added
 
-- Adds operation-level dry-run support to `aion run`.
-- Supports `--operation` and `--context` for AIONX files.
-- Evaluates operation guards against context JSON.
-- Prints guard pass/fail results and effects preview.
-- Adds example contexts and smoke coverage.
+## Out Of Scope
 
-## Validation
-
-- npm run typecheck
-- npm run schema:check
-- npm run build
-- npm test
-- npm run runtime:aionx:smoke
-- npm run out:smoke
-- npm run compiler:executable-ts:smoke
-- npm run runtime:dry-run:smoke
-
-## Notes
-
-- This is not full runtime execution.
-- Effects are previewed, not executed.
-- No database/storage adapter added.
-- package-lock.json unchanged unless dependencies changed.
-```
-
-## Out of Scope
-
-* full operation execution
-* database writes
-* storage adapters
-* audit event persistence
-* deterministic replay
-* generic executable-ts rewrite
-* app generation
+- full runtime execution
+- database writes
+- storage adapters
+- audit event persistence
+- deterministic replay
+- generic `executable-ts` rewrite
+- app generation

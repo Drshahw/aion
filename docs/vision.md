@@ -1,104 +1,112 @@
 # AION Vision
 
-AION is an experiment in AI-native software construction.
+AION is a contract-first compiler for AI-assisted software development.
 
-The project explores a simple thesis: human intent should not always compile directly into source code. A safer path is:
+AION is not primarily a programming language for humans.
+AION is not merely an intermediate representation.
+AION is a machine-oriented software generation and verification path.
+
+Its purpose is to turn human intent into validated behavioral contracts, lower those contracts into machine-native execution plans and executable artifacts, and produce behavior humans can trust through verification.
+
+Human-readable source code is not the trust boundary.
+Behavioral verification is the trust boundary.
+
+## Core Flow
 
 ```text
-Prompt
-  -> AION IR
+Human intent
+  -> AION behavioral contract
   -> validation
-  -> compile plan
-  -> target code or runtime
-  -> tests
+  -> machine-native execution plan
+  -> executable artifact
+  -> behavioral verification
+  -> AI repair loop
+  -> trusted software behavior
 ```
 
-The evolved thesis is:
+## Why AION Exists
+
+AI can generate code quickly, but speed alone does not create trust.
+If behavior is implicit inside generated source, both humans and agents are forced to recover intent by reading implementation details after the fact.
+
+AION exists to make behavior explicit before or alongside implementation:
+
+- the human describes intent
+- AI converts intent into a behavioral contract
+- AION validates the contract
+- AION lowers the contract into machine-native plans and executable artifacts
+- AI debugs and repairs failures
+- humans evaluate outputs, traces, scenarios, and reports
+
+## Positioning
+
+"AI-native IR" is still a real technical layer in AION, but it is not the product thesis.
+
+Better positioning:
 
 ```text
-Prompt
-  -> AION IR
-  -> validation
-  -> compile plan
-  -> executable behavior
-  -> runtime verification
+AION is a contract-first compiler for AI-assisted software development.
 ```
 
-AION is not just a code generator.
+It turns human intent into:
 
-AION is a behavioral contract layer between human intent, AI agents, and generated or executable software.
+- validated behavioral contracts
+- machine-native execution plans
+- executable artifacts
+- behavior verification reports
 
-It gives AI systems a precise intermediate representation that can be generated, checked, transformed, compiled, inspected, tested, and eventually executed.
+## Project Philosophy
 
-## Why AION exists
+AION should optimize for:
 
-AI coding agents can move very quickly from prompt to code. That speed is useful, but it also creates risk.
+- machine generation
+- validation
+- execution
+- repair
+- testing
+- tracing
+- behavior reports
+- low-context and low-token workflows
 
-Without an intermediate contract, behavior can become implicit, scattered, or invented inside implementation details.
+AION should not optimize primarily for:
 
-AION introduces a structured layer where the system's intended behavior is explicit before application code is written.
+- humans manually writing source code
+- humans manually debugging generated code
+- human readability of internal machine representations
 
-An AION program describes:
+## Layers of Trust
 
-- actors
-- entities
-- fields
-- operations
-- inputs
-- outputs
-- reads
-- writes
-- guards
-- effects
-- invariants
-- tests
+The human should not need to trust generated software because the generated source "looks right."
 
-This makes the behavior easier to validate, review, compile, and compare against generated code.
+The human should trust the system because behavior is:
 
-## Core idea
+- validated
+- executed
+- tested
+- traced
+- reported
 
-AION separates behavior from implementation.
+That is the shift from source review to behavioral verification.
 
-The intended system behavior should be captured first. Only after validation should AION generate artifacts, execution plans, runtime code, or application implementation.
+## Current State
 
-AION aims to make this workflow possible:
+AION currently includes:
 
-```text
-User request
-  -> AI drafts AION IR
-  -> AION validates structure and semantics
-  -> AION generates a compile plan
-  -> AION generates target artifacts
-  -> AION generates or verifies executable behavior
-  -> AI implements application code against the contract
-```
+- AION JSON IR
+- parser
+- JSON Schema validation
+- semantic validation
+- compile plan
+- runtime manifest
+- CLI
+- TypeScript target
+- SQL target
+- Mermaid graph target
+- AIONX native execution plan target
+- AIONX run inspection
+- `executable-ts` target
 
-## Principles
-
-1. **Intent first**  
-   AION captures what the system must do before deciding how to implement it.
-
-2. **Explicit behavior**  
-   Actors, entities, operations, guards, effects, invariants, and tests should be visible to validators and reviewers.
-
-3. **Verification before generation**  
-   AION should be checked before target code or runtime behavior is emitted.
-
-4. **Contract before implementation**  
-   AI agents should treat AION as the source of truth for behavior.
-
-5. **Explainable systems**  
-   Humans should be able to review system behavior without reading every generated implementation detail.
-
-6. **Target independence**  
-   AION should be able to compile into TypeScript, SQL, Mermaid graphs, native execution plans, runtime code, tests, policy rules, or future targets.
-
-7. **Runtime direction**  
-   AION should move from static generation toward runtime verification and executable behavior.
-
-## Current proof
-
-AION can now compile the car rental example into an executable in-memory TypeScript runtime and verify invoice behavior through smoke tests.
+## Current Proof
 
 The current proof is:
 
@@ -106,64 +114,41 @@ The current proof is:
 AION IR -> executable TypeScript runtime -> executed behavior smoke test passed
 ```
 
-This is an important milestone.
+This proves that AION is already beyond static description. It can generate executable behavior for a narrow vertical slice and confirm that behavior through smoke testing.
 
-It proves AION is not limited to static code or documentation artifacts. AION can generate executable behavior from IR, run that generated behavior, and verify expected operation outcomes.
+Verified behavior in the current proof includes:
 
-The current executable proof supports a narrow car rental billing vertical slice, especially:
-
-- `invoice.create`
-- `invoice.view_own`
-
-The smoke test verifies behavior such as:
-
-- admin can create an invoice
-- customer cannot create an invoice
-- negative amounts are rejected
-- customer can view their own invoice
+- admin can create invoice
+- customer cannot create invoice
+- negative amount is rejected
+- invoice total is calculated
+- invoice is stored in memory
+- customer can view own invoice
 - customer cannot view another customer's invoice
-- audit log entries are written
+- audit log is written
 
-## Current scope
+## Current Limitations
 
-AION v0.1 currently focuses on:
+Current limitations are important:
 
-- JSON-based AION IR
-- parser
-- JSON Schema validation
-- semantic validation
-- compile plan generation
-- runtime manifest generation
-- TypeScript target
-- SQL target
-- Mermaid target
-- AIONX native execution plan target
-- AIONX inspection through `aion run`
-- experimental executable TypeScript generation
+- AIONX run is inspector-level only
+- AIONX does not execute business logic yet
+- `executable-ts` is experimental and vertical-slice focused
+- there is no generic behavioral verification layer yet
+- there is no AI repair loop yet
+- there is no compact machine-native AIONX yet
+- there is no full production runtime yet
 
-## Runtime direction
+## Strategic Direction
 
-AIONX is the current native execution plan format.
+The roadmap should continue moving toward:
 
-Today, AIONX can be generated and inspected. In future versions, AIONX can become the foundation for a real runtime that evaluates guards, executes operations, connects to storage adapters, emits audit logs, and replays events deterministically.
+1. contract-first system definition
+2. behavioral verification layer
+3. machine-native execution
+4. AI debug and repair
+5. compact machine-oriented artifacts
+6. stronger proof through executable scenarios and reports
 
-The runtime direction is:
-
-```text
-AION IR
-  -> AIONX execution plan
-  -> runtime inspection
-  -> guard evaluation
-  -> operation execution
-  -> storage adapters
-  -> audit/event log
-  -> deterministic replay
-```
-
-## Long-term goal
-
-AION should make AI-built software more reliable by giving AI agents a contract they must obey before writing implementation code.
-
-The long-term goal is not simply to generate more code.
-
-The goal is to make software behavior explicit, validated, executable, inspectable, and testable from intent.
+The end state is not "more generated code."
+The end state is trusted software behavior produced from intent.
