@@ -17,25 +17,16 @@ This sprint builds on:
 - Sprint 002 - Behavioral Verification Layer
 - Sprint 003 - AIONX Operation Dry-Run / Execution
 
-## Project Philosophy
+## Project Context
 
-AION is not primarily optimized for humans manually reading generated code.
-AION is optimized for machine generation, validation, execution, testing, tracing, and repair.
+Read the canonical project context before starting:
 
-Human-readable source code is not the trust boundary.
-Behavioral verification is the trust boundary.
+- `docs/vision.md`
+- `docs/architecture.md`
+- `docs/runtime.md`
+- `docs/roadmap.md`
 
-Humans should judge AION output by:
-
-- behavior reports
-- scenario results
-- guard pass/fail results
-- expected vs actual outputs
-- effects and audit previews
-- smoke tests
-- traces
-
-AI agents should debug and repair failures based on verification output.
+This sprint does not redefine AION philosophy or current capabilities.
 
 ## Sprint 004 Objective
 
@@ -66,19 +57,6 @@ behavior verification failed
 
 Important:
 The output should be useful for AI agents, but also readable by humans.
-
-## Current Implemented Capabilities
-
-- AION JSON IR
-- validation
-- compile plan
-- runtime manifest
-- AIONX
-- AIONX inspector
-- AIONX operation dry-run
-- behavioral verification reports
-- executable-ts proof
-- smoke tests
 
 ## Expected Existing APIs
 

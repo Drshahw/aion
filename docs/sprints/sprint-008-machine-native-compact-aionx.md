@@ -1,4 +1,4 @@
-# Sprint 006 - Machine-Native Compact AIONX
+# Sprint 008 — Machine-Native Compact AIONX
 
 ## Status
 
@@ -10,7 +10,7 @@ Technical sprint for machine-native plan compaction
 
 ## Goal
 
-Implement Sprint 006 - Machine-Native Compact AIONX.
+Implement Sprint 008 - Machine-Native Compact AIONX.
 
 This sprint builds on:
 
@@ -20,27 +20,18 @@ This sprint builds on:
 - Sprint 004 - AI Debug & Repair Loop Foundation
 - Sprint 005 - Scenario/Test Generation Target
 
-## Project Philosophy
+## Project Context
 
-AION is not primarily optimized for humans manually reading generated code.
-AION is optimized for machine generation, validation, execution, testing, tracing, and repair.
+Read the canonical project context before starting:
 
-Human-readable source code is not the trust boundary.
-Behavioral verification is the trust boundary.
+- `docs/vision.md`
+- `docs/architecture.md`
+- `docs/runtime.md`
+- `docs/roadmap.md`
 
-Humans judge AION output by:
+This sprint does not redefine AION philosophy or current capabilities.
 
-- behavior reports
-- scenario results
-- guard pass/fail results
-- expected vs actual outputs
-- effects and audit previews
-- smoke tests
-- traces
-
-AI agents debug and repair failures based on verification output.
-
-## Sprint 006 Objective
+## Sprint 008 Objective
 
 Add the first compact machine-native AIONX format.
 
@@ -176,7 +167,7 @@ Operation tuple:
 ]
 ```
 
-This compact shape does not need to include every readable AIONX field in Sprint 006.
+This compact shape does not need to include every readable AIONX field in Sprint 008.
 It should include enough for:
 
 - operation identification
@@ -434,7 +425,7 @@ Explain:
 
 3. `docs/roadmap.md`
 
-Mark Sprint 006 as Compact AIONX and machine-native plan work.
+Mark Sprint 008 as Compact AIONX and machine-native plan work.
 
 4. `README.md`
 

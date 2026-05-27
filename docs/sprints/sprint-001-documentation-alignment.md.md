@@ -66,6 +66,8 @@ Allowed changes:
 - `docs/skills/aion-codex-skill.md`
 - `docs/token-management.md`
 - `docs/roadmap.md`
+- `docs/sprints/README.md`
+- `docs/sprints/*.md` (only to remove duplicated shared context and link to canonical docs)
 
 Not allowed:
 
@@ -149,6 +151,16 @@ Behavioral verification is the trust boundary.
 - create `docs/roadmap.md`
 - shift roadmap toward verification, execution, repair, compact machine plans, and ecosystem targets
 
+## Sprint Documentation Single-Source-Of-Truth Tasks
+
+Shared context (project philosophy, current capabilities, current proof) must live once in the canonical docs and not be copied into individual sprint files.
+
+- [ ] Create `docs/sprints/README.md` with the canonical sprint template.
+- [ ] Remove duplicated philosophy / current-state / current-proof blocks from sprint documents.
+- [ ] Sprint docs should link to canonical context files instead of copying shared context.
+- [ ] Each sprint doc gets a short `## Project Context` section linking to `docs/vision.md`, `docs/architecture.md`, `docs/runtime.md`, and `docs/roadmap.md`.
+- [ ] Sprint-specific constraints (e.g. the Sprint 002 bridge-evaluator rule) stay as a focused `## Design Constraint`, not as a restatement of project philosophy.
+
 ## Validation
 
 Run:
@@ -171,4 +183,17 @@ docs: align AION philosophy and roadmap
 - documents behavioral verification as the trust boundary
 - documents current `executable-ts` proof
 - adds updated roadmap
+- adds `docs/sprints/README.md` canonical sprint template
+- de-duplicates shared context out of sprint docs into canonical docs
 - no compiler/runtime behavior changed
+
+## Acceptance Criteria
+
+- canonical positioning and trust-boundary statements appear in `README.md` and `docs/vision.md`
+- `docs/roadmap.md` exists and reflects the verification → execution → repair → ecosystem direction
+- `docs/sprints/README.md` exists with the canonical sprint template
+- no sprint document duplicates the full project philosophy
+- no sprint document duplicates the full current-capabilities list
+- no sprint document duplicates the current-proof block
+- shared context lives only in `docs/vision.md`, `docs/architecture.md`, `docs/runtime.md`, and `docs/roadmap.md`
+- no compiler, runtime, CLI, or dependency changes

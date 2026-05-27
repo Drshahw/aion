@@ -27,61 +27,25 @@ The key question for this sprint is:
 Given this operation guard and this context, did the expected behavior pass or fail?
 ```
 
-## Project Philosophy
+## Project Context
 
-AION is not primarily optimized for humans manually reading generated code.
-AION is optimized for machine generation, validation, execution, testing, tracing, and repair.
+Read the canonical project context before starting:
 
-Human-readable source code is not the trust boundary.
-Behavioral verification is the trust boundary.
+- `docs/vision.md`
+- `docs/architecture.md`
+- `docs/runtime.md`
+- `docs/roadmap.md`
 
-Humans should judge AION output by:
+This sprint does not redefine AION philosophy or current capabilities.
 
-- behavior reports
-- scenario results
-- guard pass/fail results
-- expected vs actual outputs
-- effects and audit previews
-- smoke tests
-- traces
+## Design Constraint
 
-AI agents should debug and repair failures based on verification output.
+This sprint must introduce a guard evaluator abstraction.
+The initial implementation may support only simple `left operator right` string guards, but the runtime and all future sprints must depend on the abstraction, not directly on the simple parser.
 
-## Current Implemented Capabilities
-
-- AION JSON IR
-- parser
-- JSON Schema validation
-- semantic validation
-- compile plan
-- runtime manifest
-- CLI
-- TypeScript target
-- SQL target
-- Mermaid graph target
-- AIONX native execution plan target
-- AIONX run inspection
-- `--out` / `-o` output file support
-- `executable-ts` target
-- `executable-ts` generates a self-contained in-memory TypeScript runtime for the car rental vertical slice
-- smoke test confirms generated runtime behavior executes
-
-## Current Proof
-
-```text
-AION IR -> executable TypeScript runtime -> executed behavior smoke test passed
-```
-
-Verified behavior in the current `executable-ts` smoke:
-
-- admin can create invoice
-- customer cannot create invoice
-- negative amount is rejected
-- invoice total is calculated
-- invoice is stored in memory
-- customer can view own invoice
-- customer cannot view another customer's invoice
-- audit log is written
+The simple comparison evaluator is a **bridge evaluator, not the final AION guard language**.
+(ارزیابی‌گر ساده‌ی `left op right` فقط پل موقت است، نه زبان نهایی Guard در AION.)
+Future sprints may add JSONLogic or CEL adapters behind the same interface.
 
 ## Sprint 002 Objective
 
@@ -94,6 +58,7 @@ The output should be useful for:
 - future AIONX operation dry-run
 - future scenario and test generation
 - future AI repair loop
+- future guard engines (JSONLogic / CEL) without breaking callers
 
 ## Research Guidance
 
@@ -109,14 +74,21 @@ Do not execute arbitrary JavaScript.
 
 ## Scope
 
-Add a small behavioral verification layer that supports:
+Add a small behavioral verification layer built on a **pluggable guard evaluation abstraction**:
 
-1. simple guard expression evaluation
-2. multiple guard evaluation
-3. human-readable verification report formatting
-4. tests for pass and fail cases
-5. exports from the public API
-6. optional short docs update
+1. a pluggable guard evaluation layer with:
+   - an `AionGuardEvaluator` interface
+   - a `SimpleComparisonGuardEvaluator` implementation (the only engine in this sprint)
+   - a default evaluator (`defaultGuardEvaluator`) used when no evaluator is passed
+   - façade functions (`evaluateGuardExpression`, `evaluateOperationGuards`) that the rest of the system calls — callers must not depend on the simple parser directly
+2. simple guard expression evaluation (inside `SimpleComparisonGuardEvaluator`)
+3. multiple guard evaluation
+4. human-readable verification report formatting
+5. tests for pass and fail cases
+6. exports from the public API
+7. optional short docs update
+
+Naming matters: the simple engine is named `SimpleComparisonGuardEvaluator`, not `AionGuardEvaluator`, so it is never mistaken for the final AION guard language.
 
 ## Supported Guard Syntax
 
@@ -177,21 +149,48 @@ Example unsupported result:
 
 ## Required Files
 
-Create:
+Preferred structure (keeps the abstraction explicit):
 
 ```text
-src/runtime/evaluateGuards.ts
+src/runtime/guards/types.ts
+src/runtime/guards/simpleComparisonEvaluator.ts
+src/runtime/guards/evaluateGuards.ts
 src/runtime/formatBehaviorReport.ts
-src/runtime/evaluateGuards.test.ts
+src/runtime/guards/evaluateGuards.test.ts
+```
+
+If we want to avoid spreading files, a single `src/runtime/evaluateGuards.ts` is acceptable, but it must still expose the same concepts:
+
+```text
+AionGuardEvaluator
+SimpleComparisonGuardEvaluator
+defaultGuardEvaluator
+evaluateGuardExpression
+evaluateOperationGuards
 ```
 
 ## Required API
 
-`src/runtime/evaluateGuards.ts`:
+### Engine abstraction (`types.ts`)
 
 ```ts
+export type AionGuardEngineKind =
+  | "simple-comparison"
+  | "jsonlogic"
+  | "cel";
+
+export type AionGuardExpression = string | Record<string, unknown>;
+
+export interface AionGuardEvaluationContext {
+  actor?: unknown;
+  input?: unknown;
+  [key: string]: unknown;
+}
+
 export interface AionGuardEvaluation {
-  expression: string;
+  expression: AionGuardExpression;
+  expressionText?: string;
+  engine: AionGuardEngineKind;
   passed: boolean;
   reason?: string;
   actual?: unknown;
@@ -199,16 +198,61 @@ export interface AionGuardEvaluation {
   operator?: string;
 }
 
+export interface AionGuardEvaluator {
+  kind: AionGuardEngineKind;
+  evaluate(
+    expression: AionGuardExpression,
+    context: AionGuardEvaluationContext
+  ): AionGuardEvaluation;
+}
+```
+
+Note: `expression` is typed `string | Record<string, unknown>` from day one so JSONLogic/CEL adapters fit later. This sprint's engine only supports the `string` form; object expressions fail safely as unsupported.
+
+### Simple engine (`simpleComparisonEvaluator.ts`)
+
+```ts
+export class SimpleComparisonGuardEvaluator implements AionGuardEvaluator {
+  kind = "simple-comparison" as const;
+
+  evaluate(
+    expression: AionGuardExpression,
+    context: AionGuardEvaluationContext
+  ): AionGuardEvaluation {
+    // only `left op right` string guards; everything else fails safely
+  }
+}
+```
+
+### Façade (`evaluateGuards.ts`)
+
+The rest of the system depends only on these — never on the simple parser directly:
+
+```ts
+export const defaultGuardEvaluator: AionGuardEvaluator =
+  new SimpleComparisonGuardEvaluator();
+
 export function evaluateGuardExpression(
-  expression: string,
-  context: Record<string, unknown>
-): AionGuardEvaluation;
+  expression: AionGuardExpression,
+  context: AionGuardEvaluationContext,
+  options?: { evaluator?: AionGuardEvaluator }
+): AionGuardEvaluation {
+  const evaluator = options?.evaluator ?? defaultGuardEvaluator;
+  return evaluator.evaluate(expression, context);
+}
 
 export function evaluateOperationGuards(
-  guards: string[],
-  context: Record<string, unknown>
-): AionGuardEvaluation[];
+  guards: AionGuardExpression[],
+  context: AionGuardEvaluationContext,
+  options?: { evaluator?: AionGuardEvaluator }
+): AionGuardEvaluation[] {
+  return guards.map((guard) =>
+    evaluateGuardExpression(guard, context, options)
+  );
+}
 ```
+
+Sprints 003, 004, and 007 call this façade, so swapping the engine later does not break them.
 
 `src/runtime/formatBehaviorReport.ts`:
 
@@ -282,6 +326,8 @@ Required test cases:
 8. Unsupported expression fails safely
 9. Multiple guard evaluation
 10. Behavior report formatting
+11. Object/non-string expression fails safely as unsupported
+12. A custom evaluator passed via `options.evaluator` is used instead of the default (proves the abstraction is pluggable)
 
 ## Public API
 
@@ -296,6 +342,12 @@ Export:
 - `evaluateGuardExpression`
 - `evaluateOperationGuards`
 - `formatBehaviorVerificationReport`
+- `defaultGuardEvaluator`
+- `SimpleComparisonGuardEvaluator`
+- `AionGuardEvaluator`
+- `AionGuardEngineKind`
+- `AionGuardExpression`
+- `AionGuardEvaluationContext`
 - `AionGuardEvaluation`
 - `AionBehaviorVerificationReport`
 
@@ -323,6 +375,11 @@ Add only the minimal notes needed to explain the new verification layer and Spri
 
 ## Acceptance Criteria
 
+- a pluggable `AionGuardEvaluator` interface exists
+- `SimpleComparisonGuardEvaluator` is the only engine and is named as a bridge, not as the AION guard language
+- runtime and façade depend on the abstraction, not on the simple parser directly
+- `evaluateGuardExpression` / `evaluateOperationGuards` accept an optional `evaluator` and fall back to `defaultGuardEvaluator`
+- guard expression type is `string | Record<string, unknown>`; object expressions fail safely as unsupported
 - guard evaluator can evaluate simple comparison expressions
 - guard evaluator supports actor, input, and entity context values
 - guard evaluator supports bare aliases for input values
@@ -357,10 +414,12 @@ feat: add behavioral verification layer
 
 ## PR Summary
 
-- adds safe guard evaluator for simple AION guard expressions
+- adds a pluggable guard evaluator abstraction (`AionGuardEvaluator`)
+- adds `SimpleComparisonGuardEvaluator` as the first (bridge) engine
+- adds façade (`evaluateGuardExpression` / `evaluateOperationGuards`) so callers never depend on the parser directly
 - adds behavior verification report formatting
-- adds tests for pass, fail, missing, and unsupported guards
-- prepares AIONX operation dry-run and AI repair loop
+- adds tests for pass, fail, missing, unsupported, and evaluator-swap cases
+- prepares AIONX operation dry-run, AI repair loop, and future JSONLogic/CEL engines
 - no full runtime execution added
 - no dependencies added
 
@@ -372,3 +431,9 @@ feat: add behavioral verification layer
 - database adapter
 - operation dry-run CLI
 - large custom expression language
+- full JSONLogic implementation
+- full CEL implementation
+- boolean composition (`AND` / `OR` / `NOT`)
+- nested logical expressions
+
+Constraint: although these engines are out of scope for this sprint, the `AionGuardEvaluator` API must be compatible with future JSONLogic / CEL adapters without changing its callers.

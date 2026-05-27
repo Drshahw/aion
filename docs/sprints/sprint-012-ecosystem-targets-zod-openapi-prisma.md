@@ -1,4 +1,4 @@
-# Sprint 009 - Ecosystem Targets: SQL / Zod / OpenAPI / Prisma
+# Sprint 012 — Ecosystem Targets: Zod / OpenAPI / Prisma
 
 ## Status
 
@@ -10,32 +10,22 @@ Technical sprint for ecosystem-oriented compiler targets
 
 ## Goal
 
-Implement Sprint 009 - Ecosystem Targets: SQL / Zod / OpenAPI / Prisma.
+Implement Sprint 012 - Ecosystem Targets: Zod / OpenAPI / Prisma.
 
 This sprint adds the first ecosystem-oriented compiler targets that make AION useful in real software stacks.
 
-## Project Philosophy
+## Project Context
 
-AION is not primarily optimized for humans manually reading generated code.
-AION is optimized for machine generation, validation, execution, testing, tracing, and repair.
+Read the canonical project context before starting:
 
-Human-readable source code is not the trust boundary.
-Behavioral verification is the trust boundary.
+- `docs/vision.md`
+- `docs/architecture.md`
+- `docs/runtime.md`
+- `docs/roadmap.md`
 
-Humans judge AION output by:
+This sprint does not redefine AION philosophy or current capabilities.
 
-- behavior reports
-- scenario results
-- guard pass/fail results
-- expected vs actual outputs
-- effects and audit previews
-- smoke tests
-- traces
-- generated integration artifacts
-
-AI agents debug and repair failures based on verification output.
-
-## Sprint 009 Objective
+## Sprint 012 Objective
 
 Add practical ecosystem targets so AION contracts can generate useful integration artifacts for real TypeScript, API, and database projects.
 
@@ -61,36 +51,7 @@ This sprint is not a production runtime.
 This sprint is not a database adapter.
 This sprint should generate integration artifacts from AION IR.
 
-## Current Implemented Capabilities
-
-- AION JSON IR
-- parser
-- JSON Schema validation
-- semantic validation
-- compile plan
-- runtime manifest
-- CLI
-- TypeScript target
-- SQL target
-- Mermaid target
-- AIONX target
-- AIONX run inspector
-- behavioral verification layer
-- AIONX operation dry-run
-- AI repair analysis foundation
-- scenarios target
-- compact AIONX
-- generalized executable-ts behavior
-- support ticket mini project proof
-- `--out` support
-
-## Current Proof
-
-```text
-AION IR -> executable TypeScript runtime -> executed behavior smoke test passed
-```
-
-Sprint 009 should make AION more useful to real projects by generating:
+Sprint 012 should make AION more useful to real projects by generating:
 
 - runtime validation schemas
 - API specification contracts
@@ -230,7 +191,7 @@ Method convention:
 - if uncertain, use post for all operations in v0.1 for simplicity
 
 Recommended:
-Use `post` for all operations in Sprint 009 to keep it deterministic.
+Use `post` for all operations in Sprint 012 to keep it deterministic.
 
 Example path:
 
@@ -409,7 +370,7 @@ Assert file includes:
 - `ReplySchema`
 - `TicketCreateInputSchema`
 
-If support ticket example does not exist because Sprint 008 is not merged, skip with a clear note.
+If support ticket example does not exist because Sprint 011 is not merged, skip with a clear note.
 
 C) Generate OpenAPI for car rental:
 
@@ -463,7 +424,7 @@ Do not add dependencies unless absolutely necessary.
 Important:
 Zod is emitted as code that imports `zod`, but this repo does not need to install `zod` for smoke tests unless the generated file is actually compiled or run.
 Smoke should only inspect generated text.
-Therefore do not add a `zod` dependency in Sprint 009.
+Therefore do not add a `zod` dependency in Sprint 012.
 
 ## CI
 
@@ -515,7 +476,7 @@ Explain:
 
 ### 3. docs/roadmap.md
 
-Mark Sprint 009 as ecosystem targets.
+Mark Sprint 012 as ecosystem targets.
 
 ### 4. docs/targets/ecosystem-targets.md
 

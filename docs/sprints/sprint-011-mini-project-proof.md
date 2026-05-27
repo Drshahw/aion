@@ -1,4 +1,4 @@
-# Sprint 008 - Mini Project Proof
+# Sprint 011 — Mini Project Proof
 
 ## Status
 
@@ -10,43 +10,22 @@ Technical sprint for second-domain proof validation
 
 ## Goal
 
-Implement Sprint 008 - Mini Project Proof.
+Implement Sprint 011 - Mini Project Proof.
 
 This sprint validates the AION-first workflow on a new domain beyond the existing car rental example.
 
-## Project Philosophy
+## Project Context
 
-AION is not primarily optimized for humans manually reading generated code.
-AION is optimized for machine generation, validation, execution, testing, tracing, and repair.
+Read the canonical project context before starting:
 
-Human-readable source code is not the trust boundary.
-Behavioral verification is the trust boundary.
+- `docs/vision.md`
+- `docs/architecture.md`
+- `docs/runtime.md`
+- `docs/roadmap.md`
 
-Humans judge AION output by:
+This sprint does not redefine AION philosophy or current capabilities.
 
-- behavior reports
-- scenario results
-- guard pass/fail results
-- expected vs actual outputs
-- effects and audit previews
-- smoke tests
-- traces
-
-AI agents debug and repair failures based on verification output.
-
-## Current Proof
-
-```text
-AION IR -> executable TypeScript runtime -> executed behavior smoke test passed
-```
-
-Current proof domain:
-
-```text
-car rental billing
-```
-
-## Sprint 008 Objective
+## Sprint 011 Objective
 
 Create a second mini project proof using the AION-first workflow.
 
@@ -315,7 +294,7 @@ Tests:
 Use the current AION IR schema.
 Do not invent unsupported schema features unless already implemented.
 
-If relation metadata is not supported yet, keep `customer_id` and `ticket_id` as uuid fields without relation objects.
+Relation metadata is available from Sprint 007, so the support ticket example should use it for real relationships (`ticket.customer_id -> customer.id`, `reply.ticket_id -> ticket.id`). If for any reason relations are not yet merged, fall back to plain `uuid` fields without relation objects.
 If operation input and output shapes must match existing schema, follow the current schema strictly.
 
 ## Tasks
@@ -349,7 +328,7 @@ node dist/src/cli.js compile aionx examples/support-ticket-system.aion.json --ou
 node dist/src/cli.js run <tmp>/support-ticket-system.aionx.json
 ```
 
-If compact AIONX exists from Sprint 006, also test:
+If compact AIONX exists from Sprint 008, also test:
 
 ```bash
 node dist/src/cli.js compile aionx examples/support-ticket-system.aion.json --compact --out <tmp>/support-ticket-system.compact.aionx.json
@@ -639,7 +618,7 @@ Add a short mention under examples:
 Support Ticket System proof
 ```
 
-Mark Sprint 008 as mini project proof.
+Mark Sprint 011 as mini project proof.
 
 ## Acceptance Criteria
 
