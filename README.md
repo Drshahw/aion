@@ -1,101 +1,251 @@
 # AION
 
-**AI-native Intermediate Representation for compiling human intent into verified software systems.**
+AION is a contract-first compiler for AI-assisted software development.
 
-AION is an experimental open-source project exploring a new layer for AI software creation:
+It turns human intent into validated behavioral contracts, machine-native execution plans, executable artifacts, and behavior verification reports.
+
+AION is not optimized for humans manually writing or reading generated code.
+It is optimized for AI agents to generate, validate, execute, test, and repair software behavior while humans judge the system by outputs, scenarios, traces, and verification reports.
+
+Human-readable source code is not the trust boundary.
+Behavioral verification is the trust boundary.
+
+## What AION Is Today
+
+AION has evolved beyond an "AI-native IR" experiment.
+
+"AI-native IR" is still part of the implementation strategy, but it is not the end goal. Today, AION is better understood as a contract-first compiler for AI-assisted software development:
 
 ```text
-Human prompt → AI understanding → AION IR → validation → target code/runtime → tests → deployable software
+Human intent
+  -> AION behavioral contract
+  -> validation
+  -> machine-native execution plan
+  -> executable artifact
+  -> behavioral verification
+  -> AI repair loop
+  -> trusted software behavior
 ```
 
-AION is not trying to replace Python, TypeScript, SQL, or Rust. Instead, it aims to become an intermediate representation that AI systems can generate, validate, transform, compile, and explain.
+AION should optimize for:
 
-## Quick start
+- machine generation
+- validation
+- execution
+- repair
+- testing
+- tracing
+- behavior reports
+- low-context and low-token workflows
+
+AION should not optimize primarily for:
+
+- humans manually writing source code
+- humans manually debugging generated code
+- human readability of internal machine representations
+
+## Current Capabilities
+
+AION currently includes:
+
+- AION JSON IR
+- parser
+- JSON Schema validation
+- semantic validation
+- compile plan
+- runtime manifest
+- CLI
+- TypeScript target
+- SQL target
+- Mermaid graph target
+- AIONX native execution plan target
+- AIONX run inspection
+- `--out` / `-o` output file support
+- `executable-ts` target
+- self-contained in-memory executable TypeScript generation for the car rental vertical slice
+
+## Current Proof
+
+The current proof is:
+
+```text
+AION IR -> executable TypeScript runtime -> executed behavior smoke test passed
+```
+
+Verified behavior in the current `executable-ts` smoke test:
+
+- admin can create invoice
+- customer cannot create invoice
+- negative amount is rejected
+- invoice total is calculated
+- invoice is stored in memory
+- customer can view own invoice
+- customer cannot view another customer's invoice
+- audit log is written
+
+## Quick Start
+
+Fresh clone:
 
 ```bash
 npm install
+npm run build
 npm run typecheck
 npm run schema:check
+```
+
+If dependencies are already installed:
+
+```bash
+git pull
 npm run build
+npm run typecheck
+npm run schema:check
 ```
 
-## Start a new AION file
+The CLI runs from:
 
 ```bash
-npm run aion -- init
-npm run aion -- init gym.aion.json
+node dist/src/cli.js
 ```
 
-## CLI usage
+Do not assume `aion` is globally installed. Prefer:
 
 ```bash
-npm run aion -- validate examples/car-rental-system.aion.json
-npm run aion -- plan examples/car-rental-system.aion.json
-npm run aion -- manifest examples/car-rental-system.aion.json
-npm run aion -- graph examples/car-rental-system.aion.json
-npm run aion -- compile typescript examples/car-rental-system.aion.json
-npm run aion -- compile executable-ts examples/car-rental-system.aion.json
-npm run aion -- compile sql examples/car-rental-system.aion.json
-npm run aion -- compile mermaid examples/car-rental-system.aion.json
-npm run aion -- compile aionx examples/car-rental-system.aion.json
-npm run aion -- run app.aionx.json
+node dist/src/cli.js ...
 ```
 
-For clean generated files, use `node` directly:
+or:
+
+```bash
+npm run aion -- ...
+```
+
+## Car Rental Proof
+
+Validate:
+
+```bash
+node dist/src/cli.js validate examples/car-rental-system.aion.json
+```
+
+Generate compile plan:
+
+```bash
+node dist/src/cli.js plan examples/car-rental-system.aion.json
+```
+
+Generate graph:
+
+```bash
+node dist/src/cli.js graph examples/car-rental-system.aion.json --out system.mmd
+```
+
+Generate AIONX:
+
+```bash
+node dist/src/cli.js compile aionx examples/car-rental-system.aion.json --out app.aionx.json
+```
+
+Run AIONX inspector:
+
+```bash
+node dist/src/cli.js run app.aionx.json
+```
+
+Generate executable TypeScript:
+
+```bash
+node dist/src/cli.js compile executable-ts examples/car-rental-system.aion.json --out generated-runtime.ts
+```
+
+Run the executable behavior smoke test:
+
+```bash
+npm run compiler:executable-ts:smoke
+```
+
+Shortest proof path:
+
+```bash
+npm install
+npm run build
+node dist/src/cli.js compile executable-ts examples/car-rental-system.aion.json --out generated-runtime.ts
+npm run compiler:executable-ts:smoke
+```
+
+## Generate Artifacts
+
+TypeScript:
 
 ```bash
 node dist/src/cli.js compile typescript examples/car-rental-system.aion.json --out generated.ts
-node dist/src/cli.js compile executable-ts examples/car-rental-system.aion.json --out generated-runtime.ts
+```
+
+SQL:
+
+```bash
 node dist/src/cli.js compile sql examples/car-rental-system.aion.json --out generated.sql
-node dist/src/cli.js compile mermaid examples/car-rental-system.aion.json --out system.mmd
-node dist/src/cli.js graph examples/car-rental-system.aion.json --out system.mmd
-node dist/src/cli.js compile aionx examples/car-rental-system.aion.json --out app.aionx.json
-node dist/src/cli.js run app.aionx.json
 ```
 
-Use `--out` or `-o` instead of shell redirect on Windows PowerShell to avoid encoding issues in generated files.
+Mermaid:
 
-## AIONX native target
+```bash
+node dist/src/cli.js compile mermaid examples/car-rental-system.aion.json --out system.mmd
+```
 
-AIONX is the first native AION target. It emits a machine-readable execution plan instead of human-oriented source code.
+or:
+
+```bash
+node dist/src/cli.js graph examples/car-rental-system.aion.json --out system.mmd
+```
+
+AIONX:
 
 ```bash
 node dist/src/cli.js compile aionx examples/car-rental-system.aion.json --out app.aionx.json
-node dist/src/cli.js run app.aionx.json
 ```
 
-`run` is currently an inspector and dry-run runtime. It prints a summary of the compiled AIONX execution plan, but it does not execute business logic yet.
-
-The underlying AIONX artifact is still the first compiled internal plan that a future AION Runtime can interpret, optimize, replay, or execute.
-
-## Executable TypeScript target
-
-`executable-ts` is an experimental proof-of-concept target. It generates an in-memory executable runtime to prove that operation behavior can be derived from AION IR.
+`executable-ts`:
 
 ```bash
 node dist/src/cli.js compile executable-ts examples/car-rental-system.aion.json --out generated-runtime.ts
 ```
 
-This target is intentionally narrow. It is not a full app generator yet, but it demonstrates executable behavior for the current car-rental operations.
+## Why `--out` Should Be Used
 
-## Existing targets
+Prefer `--out` or `-o` instead of shell redirect when generating artifacts:
 
-- TypeScript interfaces and operation stubs
-- PostgreSQL-compatible SQL DDL
-- Mermaid behavior graph
-- AIONX native execution plan
+```bash
+node dist/src/cli.js compile sql examples/car-rental-system.aion.json --out generated.sql
+```
 
-## JSON Schema
+This keeps generated artifacts explicit and avoids shell redirect encoding issues, especially in PowerShell.
 
-AION v0.1 includes a formal JSON Schema at `schema/aion-0.1.schema.json`.
+## Current Limitations
 
-See `docs/schema.md` for details.
+Current limitations include:
 
-## Project thesis
+- AIONX run is inspector-level only
+- AIONX does not execute business logic yet
+- `executable-ts` is experimental and vertical-slice focused
+- there is no generic behavioral verification layer yet
+- there is no AI repair loop yet
+- there is no compact machine-native AIONX yet
+- there is no database adapter yet
+- there is no full app generator yet
+- there is no production runtime yet
 
-> Code is no longer only written. It can be compiled from intent.
+## Documentation
 
-AION explores what sits between intent and software.
+- [Vision](docs/vision.md)
+- [Architecture](docs/architecture.md)
+- [Runtime](docs/runtime.md)
+- [Executable TypeScript Target](docs/executable-ts.md)
+- [AION Codex Skill](docs/skills/aion-codex-skill.md)
+- [Token Management](docs/token-management.md)
+- [Roadmap](docs/roadmap.md)
+- [Schema](docs/schema.md)
 
 ## License
 
